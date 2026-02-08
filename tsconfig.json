@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "target": "ES2020",
+
+    /* Modules & Bundler Support */
+    "module": "ES2020",
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* Type Declaration */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    /* Browser Support */
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "testClient"]
+}

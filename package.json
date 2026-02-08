@@ -1,0 +1,33 @@
+{
+  "name": "@ucoder/core",
+  "version": "0.1.0-beta.1",
+  "description": "A lightweight analytics SDK for SPAs",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "browser": "dist/index.global.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format iife --clean",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "analytics",
+    "tracking",
+    "react",
+    "nextjs",
+    "sdk"
+  ],
+  "author": "Ucoder",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.10.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "web-vitals": "^5.1.0"
+  }
+}
