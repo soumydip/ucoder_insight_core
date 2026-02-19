@@ -7,8 +7,8 @@ export { initProject, trackCustomEvent };
 
 // Global flags
 let isVanillaJS = false;
-let isReady = false; //  FIX: Track ready state
-const eventQueue: customEventConfig[] = []; //  FIX: Buffer for early events
+let isReady = false;
+const eventQueue: customEventConfig[] = [];
 
 // Helper to process queued events
 const processQueue = () => {
@@ -24,31 +24,30 @@ if (typeof window !== "undefined") {
   isVanillaJS = true;
 
   (window as any).ucoderInsight = {
-    version: "2.0.0",
+    version: "1.0.0",
 
     isReady: () => isReady,
     isVanilla: () => isVanillaJS,
 
     // Initialize
     init: async (projectId: string, options = {}) => {
-      console.log("🚀 [Ucoder Insight] Initializing in Vanilla JS mode...");
+      console.log(" [Ucoder Insight] Initializing in Vanilla JS mode...");
 
       const config = await initProject(projectId, options);
 
       if (config) {
-        isReady = true; //  FIX: Mark ready
-        processQueue(); //  FIX: Send queued events
+        isReady = true;
+        processQueue(); // Send queued events
       }
 
       return config;
     },
 
-    // Track custom event (with Queue support)
     track: (config: customEventConfig) => {
-      //  FIX: If not ready, add to queue
+      //  If not ready, add to queue
       if (!isReady) {
         console.log(
-          "⏳ [Ucoder Insight] SDK initializing, event queued:",
+          " [Ucoder Insight] SDK initializing, event queued:",
           config.event_name,
         );
         eventQueue.push(config);
@@ -70,7 +69,7 @@ if (typeof window !== "undefined") {
   // Emit ready event
   window.dispatchEvent(
     new CustomEvent("ucoderInsightReady", {
-      detail: { version: "2.0.0", mode: "vanilla" },
+      detail: { version: "1.0.0", mode: "vanilla" },
     }),
   );
 }

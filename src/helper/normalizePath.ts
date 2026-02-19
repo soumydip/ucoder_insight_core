@@ -9,7 +9,7 @@
  */
 export function normalizeUrl(rawUrl: string) {
   try {
-    const parsedUrl = new URL(rawUrl, "http://ucoder.in");
+    const parsedUrl = new URL(rawUrl, window.location.origin);
     let path = parsedUrl.pathname;
 
     // remove trailing slash

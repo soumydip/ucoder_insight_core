@@ -3,7 +3,7 @@ import { registerClickEvent } from "../events/click.events";
 import { startLogReporter } from "../log/logReporter";
 import { loadUserToken } from "../loader/getUser";
 import { registerErrorTracking } from "../events/error.events";
-import { initSpaPageTracking } from "../events/pageView.events";
+import { enableAutoPageTracking } from "../events/pageView.events";
 import { normalizeUrl } from "../helper/normalizePath";
 import { configureTracker } from "../loader/notTrakingPath";
 import { NotTrackPageConfig } from "../interface/event.interface";
@@ -44,6 +44,11 @@ export async function initProject(
   if (userConfig) {
     configureTracker(userConfig);
   }
+  if (userConfig?.debug) {
+    console.log(
+      " [Ucoder Insight] Running in Testing Mode - No data will be sent to server",
+    );
+  }
 
   // Try to fetch remote config
   const config = await resolveConfig(projectId);
@@ -56,6 +61,8 @@ export async function initProject(
     return null;
   }
 
+  // ceck is testing mode
+
   isInitialized = true;
 
   // Normalize current page URL
@@ -67,7 +74,7 @@ export async function initProject(
 
   // Register event listeners based on config
   if (config.trackClicks) registerClickEvent(page);
-  if (config.trackPageViews) initSpaPageTracking();
+  if (config.trackPageViews) enableAutoPageTracking();
   if (config.trackScroll) registerScrollTracker();
   if (config.trackErrors) registerErrorTracking();
   if (config.trackPerformance) registerPerformanceTracking();

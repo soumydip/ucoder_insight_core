@@ -1,7 +1,7 @@
 {
-  "name": "@ucoder/core",
+  "name": "ucoder-insight",
   "version": "0.1.0-beta.1",
-  "description": "A lightweight analytics SDK for SPAs",
+  "description": "A lightweight analytics SDK for React , Next.js, Valinla javascript or any SPA applications, designed to be easy to integrate and use.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "browser": "dist/index.global.js",
@@ -10,7 +10,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format iife --clean",
+    "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean",
+    "dev": " src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -29,5 +30,13 @@
   },
   "dependencies": {
     "web-vitals": "^5.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soumydip/ucoder_insight_core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/soumydip/ucoder_insight_core/issues"
+  },
+  "homepage": "https://github.com/soumydip/ucoder_insight_core#readme"
 }

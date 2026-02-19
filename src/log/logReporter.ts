@@ -28,7 +28,7 @@ export function startLogReporter(
     if (batch.length > 0) {
       onBatchReady?.(batch);
       sendEvents(batch);
-      console.log("📤 Sending Batch:", batch.length, "events");
+      console.log(" Sending Batch:", batch.length, "events");
     }
 
     // Clean up sent logs

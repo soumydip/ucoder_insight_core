@@ -63,7 +63,8 @@ export enum ErrorType {
 }
 
 /**
- * Event names (Optional: if you need specific names).
+ * Event names 
+ * 
  */
 export enum EventName {
   CLICK = "click",

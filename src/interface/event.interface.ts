@@ -63,6 +63,12 @@ export interface NotTrackPageConfig {
    */
 
   notTrackPath?: string | string[];
+
+  /**
+   * Flag to enable testing mode, which logs events to the console instead of sending them to the API. Useful for development and debugging. Not recommended for production use.
+   */
+  debug?: boolean; 
+  
 }
 
 export interface NotTrackPage {}

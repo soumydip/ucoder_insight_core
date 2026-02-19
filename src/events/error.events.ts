@@ -75,6 +75,7 @@ const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
   });
 };
 
+
 // Main function to register all error tracking
 export function registerErrorTracking() {
   //  Check if error tracking is enabled

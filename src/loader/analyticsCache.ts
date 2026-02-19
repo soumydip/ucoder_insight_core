@@ -23,3 +23,7 @@ export const SDKConfigCache = {
   trackCustomEvents: true,
   allowDomins: [] as string[],
 };
+
+export const optionalConfigCache = {
+  debug: true as boolean,
+}

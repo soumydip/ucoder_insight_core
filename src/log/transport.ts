@@ -5,19 +5,25 @@ import {
   deleteSpecificBatches,
   getOfflineDataCount,
 } from "../db/cache.offline";
+import {
+  isLocalhost,
+  isTestingMode,
+  shouldLogToConsole,
+  shouldSendToAPI,
+  envLog,
+  debugLog,
+  getEnvironmentLabel,
+} from "../utils/environment";
 
-const API_URL = "http://localhost:5000/event/log";
+const API_URL = "https://insight-api.ucoder.in/event/log";
 
 let isSyncing = false;
 
-// 🎯 Logging enabled hobe jokhon SDK properly configured
 export const isLogEnabled = (): boolean => {
-  // Check if SDK is properly initialized
   if (!SDKConfigCache.projectId) {
     return false;
   }
 
-  // Check if project ID is valid
   if (!analyticsCache.projectId) {
     return false;
   }
@@ -25,40 +31,52 @@ export const isLogEnabled = (): boolean => {
   return true;
 };
 
-// Manual override (optional, for testing)
+// Manual override
 let manualOverride: boolean | null = null;
 
 export const setLogEnabled = (enabled: boolean) => {
   manualOverride = enabled;
-  console.log(`📡 Logging manually ${enabled ? "ENABLED" : "DISABLED"}`);
+  console.log(`Logging manually ${enabled ? "ENABLED" : "DISABLED"}`);
 };
 
 export const isLoggingAllowed = (): boolean => {
-  // Manual override takes priority
   if (manualOverride !== null) {
     return manualOverride;
   }
 
-  // Otherwise check SDK config
   return isLogEnabled();
 };
 
+/**
+ *  Send events using Beacon API or Fetch
+ */
 export const sendEvents = async (batch: any[]) => {
-  //  If SDK not configured properly, don't send
   if (!isLoggingAllowed()) {
     console.warn(" SDK not configured or logging disabled. Batch dropped.");
     return;
   }
 
   if (!analyticsCache.projectId) {
-    console.warn("⛔ SDK: Project ID missing, dropping batch.");
+    console.warn(" SDK: Project ID missing, dropping batch.");
+    return;
+  }
+
+  //  Testing Mode or Localhost - Log to console only
+  if (shouldLogToConsole()) {
+    envLog("Logging to console instead of API");
+    console.log(" Analytics Events:", {
+      projectId: analyticsCache.projectId,
+      eventsCount: batch.length,
+      timestamp: new Date().toISOString(),
+      events: batch,
+    });
     return;
   }
 
   // Offline handling
   if (!navigator.onLine) {
     if (SDKConfigCache.cacheOffline) {
-      console.log("📥 Device Offline. Saving to DB.");
+      debugLog("Device Offline. Saving to DB.");
       await saveOfflineBatch(batch);
     }
     return;
@@ -70,12 +88,33 @@ export const sendEvents = async (batch: any[]) => {
   };
 
   try {
+    //  Try sendBeacon first
+    if (navigator.sendBeacon && typeof navigator.sendBeacon === "function") {
+      const blob = new Blob([JSON.stringify(payload)], {
+        type: "application/json",
+      });
+
+      const beaconSent = navigator.sendBeacon(API_URL, blob);
+
+      if (beaconSent) {
+        debugLog(" Batch sent via Beacon API");
+        return;
+      } else {
+        console.warn("Beacon API failed, falling back to fetch");
+      }
+    }
+
+    //  Fallback to fetch
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
       keepalive: true,
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     const result = await response.json();
 
@@ -84,7 +123,7 @@ export const sendEvents = async (batch: any[]) => {
       return;
     }
 
-    console.log(" Batch sent successfully");
+    debugLog(" Batch sent successfully via fetch");
   } catch (error) {
     if (SDKConfigCache.cacheOffline) {
       console.warn(" Network/Server failed. Saving to Offline DB.");
@@ -95,9 +134,17 @@ export const sendEvents = async (batch: any[]) => {
   }
 };
 
+/**
+ *  Process offline queue
+ */
 const processOfflineQueue = async (): Promise<boolean> => {
-  //  Skip sync if logging not allowed
   if (!isLoggingAllowed()) {
+    return false;
+  }
+
+  //  Skip API calls in testing mode or localhost
+  if (shouldLogToConsole()) {
+    debugLog("Skipping offline queue sync");
     return false;
   }
 
@@ -118,7 +165,7 @@ const processOfflineQueue = async (): Promise<boolean> => {
     const allOfflineEvents = offlineRecords.flatMap((r: any) => r.events);
     const batchIdsToDelete = offlineRecords.map((r: any) => r.id);
 
-    console.log(`♻️ Syncing ${offlineRecords.length} offline batches...`);
+    debugLog(` Syncing ${offlineRecords.length} offline batches...`);
 
     const payload = {
       projectId: analyticsCache.projectId,
@@ -132,11 +179,15 @@ const processOfflineQueue = async (): Promise<boolean> => {
       keepalive: true,
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const result = await response.json();
 
     if (result.success) {
       await deleteSpecificBatches(batchIdsToDelete);
-      console.log(" Offline Sync Successful!");
+      debugLog(" Offline Sync Successful!");
       return true;
     } else {
       console.error(" Data Rejected. Deleting bad batches.");
@@ -156,8 +207,10 @@ export const startBackgroundSync = async () => {
 
   try {
     if (!isLoggingAllowed()) {
-      // SDK not ready - longer wait
-      nextDelay = 30000; // 30s
+      nextDelay = 30000;
+    } else if (shouldLogToConsole()) {
+      nextDelay = 10000;
+      debugLog("Background sync paused");
     } else if (navigator.onLine) {
       const pendingCount = await getOfflineDataCount();
 
@@ -171,7 +224,7 @@ export const startBackgroundSync = async () => {
       nextDelay = 5000;
     }
   } catch (error) {
-    console.error("Background Sync Error:", error);
+    console.error(" Background Sync Error:", error);
   }
 
   setTimeout(() => {

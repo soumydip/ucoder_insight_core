@@ -5,43 +5,50 @@ import { is404Page, isNotTrackPage } from "../loader/notTrakingPath";
 import { getReferralSource } from "../helper/getReferralSource";
 import { analyticsCache, SDKConfigCache } from "../loader/analyticsCache";
 
+// ==========================================
+// STATE & CONFIG
+// ==========================================
+const DEBOUNCE_DELAY_MS = 500;
+const MIN_DURATION_MS = 1000;
+
 let currentPage = "";
 let pageStartTime = 0;
 let enterTimeout: ReturnType<typeof setTimeout> | null = null;
+let isTrackingInitialized = false;
 
-const DEBOUNCE_DELAY_MS = 500;
-const MIN_DURATION_MS = 1000; // Minimum 1 second
-const referralSource = getReferralSource() || "direct";
+// ==========================================
+// CORE TRACKING LOGIC
+// ==========================================
 
-function trackPageEnter(rawPage: string) {
-  //  Check if page view tracking is enabled
-  if (!SDKConfigCache.trackPageViews) {
-    console.log(" Page view tracking is disabled");
-    return;
-  }
+function trackPageEnter(rawPage: string): void {
+  // 1. Config Check
+  if (!SDKConfigCache.trackPageViews) return;
 
-  // not track if not traking page or 404 page
+  // 2. Filter Check (404 or Excluded)
   if (isNotTrackPage(rawPage) || is404Page(rawPage)) {
-    console.log(" Page view tracking is disabled for this page:", rawPage);
+    console.log("Skipping tracking for:", rawPage);
     return;
   }
 
-  // Clear previous timeout
-  if (enterTimeout) {
-    clearTimeout(enterTimeout);
-  }
+  // 3. Debounce (To prevent double firing in some edge cases)
+  if (enterTimeout) clearTimeout(enterTimeout);
 
   enterTimeout = setTimeout(() => {
-    // Check for 404 page
-    if (isNotTrackPage(rawPage) || is404Page(rawPage)) {
-      console.warn(" Not tracking page:", rawPage);
+    // 4. Double check if page changed or valid
+    if (isNotTrackPage(rawPage) || is404Page(rawPage)) return;
+
+    const normalizedPage = normalizeUrl(rawPage);
+
+    // Prevent tracking the same page twice consecutively (Optional safety)
+    if (currentPage === normalizedPage && Date.now() - pageStartTime < 1000) {
       return;
     }
 
-    const normalizedPage = normalizeUrl(rawPage);
+    // Set new state
     currentPage = normalizedPage;
     pageStartTime = Date.now();
 
+    // 5. Send Log
     safeLog(EventType.PAGE_VIEW, ActionType.NAVIGATION, {
       element: normalizedPage,
       key: `page_view:${normalizedPage}`,
@@ -50,148 +57,148 @@ function trackPageEnter(rawPage: string) {
       userId: analyticsCache.userId,
       additionalInfo: {
         rawUrl: rawPage,
-        referral: referralSource,
+        referral: getReferralSource() || "direct", // Get fresh referral
         UT: analyticsCache.isNewUser ? 1 : 0,
+        timestamp: Date.now(),
       },
     });
 
-    console.log(" Page view tracked:", normalizedPage);
+    console.log("📍 Page View Tracked:", normalizedPage);
   }, DEBOUNCE_DELAY_MS);
 }
 
-function trackPageExit() {
-  if (!currentPage) return;
+function trackPageExit(): void {
+  if (!currentPage || !pageStartTime) return;
 
   const duration = Date.now() - pageStartTime;
 
-  //  Skip if duration too short
   if (duration < MIN_DURATION_MS) {
-    console.log(" Page duration too short, skipping exit tracking");
+    // Reset but don't log if too short
     currentPage = "";
     pageStartTime = 0;
     return;
   }
 
   safeLog(EventType.PAGE_VIEW, ActionType.TIME_TRACKING, {
-    element: currentPage, //  Use page name instead of "duration"
+    element: currentPage,
     key: `duration:${currentPage}`,
     page: currentPage,
     tag: "page",
     userId: analyticsCache.userId,
     additionalInfo: {
-      referralSource: referralSource,
       durationMs: duration,
       durationSec: Math.round(duration / 1000),
       UT: analyticsCache.isNewUser ? 1 : 0,
+      timestamp: Date.now(),
     },
   });
 
-  console.log(
-    ` Page exit tracked: ${currentPage} (${Math.round(duration / 1000)}s)`,
-  );
+  console.log(`⏱️ Page Exit: ${currentPage} (${Math.round(duration / 1000)}s)`);
 
-  //  Reset state
   currentPage = "";
   pageStartTime = 0;
 }
 
-interface PageChangeCallback {
-  (newPage: string): void;
-}
+// ==========================================
+// UNIVERSAL AUTO-DETECTION LOGIC
+// ==========================================
 
-function trackVanillaNavigation() {
-  window.addEventListener("DOMContentLoaded", () => {
+/**
+ * This function handles BOTH Vanilla JS and SPAs automatically.
+ * It monkey-patches the History API to detect SPA changes,
+ * and uses standard DOM events for initial loads and exits.
+ */
+export function enableAutoPageTracking(): void {
+  // Prevent double initialization
+  if (isTrackingInitialized) {
+    console.warn("⚠️ Page tracking already initialized.");
+    return;
+  }
+
+  if (!SDKConfigCache.trackPageViews) {
+    console.log("🚫 Page tracking disabled in config.");
+    return;
+  }
+
+  isTrackingInitialized = true;
+  console.log("🚀 Auto Page Tracking Initialized (Universal Mode)");
+
+  // ---------------------------------------------
+  // 1. INITIAL LOAD (Works for SPA & Vanilla)
+  // ---------------------------------------------
+  const handleInitialLoad = () => {
+    trackPageEnter(location.pathname + location.search);
+  };
+
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    handleInitialLoad();
+  } else {
+    window.addEventListener("DOMContentLoaded", handleInitialLoad);
+  }
+
+  // ---------------------------------------------
+  // 2. SPA NAVIGATION (History API Interception)
+  // ---------------------------------------------
+  // Only intercept if History API is available
+  if (typeof history !== "undefined") {
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    // Override pushState (Used by React Router, Vue Router, etc.)
+    history.pushState = function (...args) {
+      const prevUrl = location.pathname + location.search;
+      const result = originalPushState.apply(this, args);
+      const newUrl = location.pathname + location.search;
+
+      if (prevUrl !== newUrl) {
+        trackPageExit(); // End previous page
+        trackPageEnter(newUrl); // Start new page
+      }
+      return result;
+    };
+
+    // Override replaceState
+    history.replaceState = function (...args) {
+      const prevUrl = location.pathname + location.search;
+      const result = originalReplaceState.apply(this, args);
+      const newUrl = location.pathname + location.search;
+
+      if (prevUrl !== newUrl) {
+        trackPageExit();
+        trackPageEnter(newUrl);
+      }
+      return result;
+    };
+  }
+
+  // ---------------------------------------------
+  // 3. BROWSER NAVIGATION (Back/Forward Buttons)
+  // ---------------------------------------------
+  window.addEventListener("popstate", () => {
+    trackPageExit();
     trackPageEnter(location.pathname + location.search);
   });
-}
 
-function trackHashNavigation() {
+  // (Optional) Hash change for older routers
   window.addEventListener("hashchange", () => {
     trackPageExit();
     trackPageEnter(location.pathname + location.hash);
   });
-}
 
-function enableSpaNavigationTracking(onPageChange: PageChangeCallback): void {
-  const pushState = history.pushState;
-  const replaceState = history.replaceState;
-
-  // Override pushState
-  history.pushState = function (
-    ...args: Parameters<typeof pushState>
-  ): ReturnType<typeof pushState> {
-    const prevPath = location.pathname + location.search;
-    const result = pushState.apply(this, args);
-    const newPath = location.pathname + location.search;
-
-    if (prevPath !== newPath) {
-      onPageChange(newPath);
-    }
-    return result;
-  };
-
-  // Override replaceState
-  history.replaceState = function (
-    ...args: Parameters<typeof replaceState>
-  ): ReturnType<typeof replaceState> {
-    const prevPath = location.pathname + location.search;
-    const result = replaceState.apply(this, args);
-    const newPath = location.pathname + location.search;
-
-    if (prevPath !== newPath) {
-      onPageChange(newPath);
-    }
-    return result;
-  };
-
-  // Browser back/forward navigation
-  window.addEventListener("popstate", (): void => {
-    onPageChange(location.pathname + location.search);
-  });
-
-  // Hash change navigation
-  window.addEventListener("hashchange", (): void => {
-    onPageChange(location.pathname + location.hash);
-  });
-}
-
-export function initSpaPageTracking() {
-  //  Check if page tracking is enabled
-  if (!SDKConfigCache.trackPageViews) {
-    console.log(" SPA page tracking is disabled");
-    return;
-  }
-  // if not traking page or 404 page
-  if (is404Page(location.pathname) || isNotTrackPage(location.pathname)) {
-    console.log(
-      " SPA page tracking is disabled for this page:",
-      location.pathname,
-    );
-    return;
-  }
-
-  let lastTrackedPage = location.pathname + location.search;
-  trackPageEnter(lastTrackedPage);
-
-  enableSpaNavigationTracking((newPage: string): void => {
-    if (newPage === lastTrackedPage) return;
-
-    trackPageExit();
-    trackPageEnter(newPage);
-    lastTrackedPage = newPage;
-  });
-
-  // Track exit on page unload
-  window.addEventListener("beforeunload", () => {
-    trackPageExit();
-  });
-
-  //  Track exit on tab visibility change
+  // ---------------------------------------------
+  // 4. PAGE EXIT / TAB CLOSE (Works for Everyone)
+  // ---------------------------------------------
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
       trackPageExit();
     }
   });
 
-  console.log(" SPA page tracking initialized");
+  // Fallback for desktop close
+  window.addEventListener("beforeunload", () => {
+    trackPageExit();
+  });
 }
