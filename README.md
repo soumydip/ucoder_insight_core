@@ -1,9 +1,9 @@
 <div align="center">
-  <h1>🎯 UCoder Insight Core</h1>
+  <h1> UCoder Insight</h1>
   <p><strong>Powerful analytics and user insights tracking SDK for modern web applications</strong></p>
   
-  [![npm version](https://img.shields.io/npm/v/@ucoder/insight-core.svg)](https://www.npmjs.com/package/@ucoder/insight-core)
-  [![npm downloads](https://img.shields.io/npm/dm/@ucoder/insight-core.svg)](https://www.npmjs.com/package/@ucoder/insight-core)
+  [![npm version](https://img.shields.io/npm/v/@ucoder/insight-core.svg)](https://www.npmjs.com/package/ucoder-insight)
+  [![npm downloads](https://img.shields.io/npm/dm/@ucoder/insight-core.svg)](https://www.npmjs.com/package/ucoder-insight)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
   [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
   
@@ -32,30 +32,30 @@
 
 ---
 
-## 📦 Installation
+##  Installation
 
 ### npm
 
 ```bash
-npm install @ucoder/insight-core
+npm install ucoder-insight
 ```
 
 ### yarn
 
 ```bash
-yarn add @ucoder/insight-core
+yarn add ucoder-insight
 ```
 
 ### pnpm
 
 ```bash
-pnpm add @ucoder/insight-core
+pnpm add ucoder-insight
 ```
 
 ### CDN
 
 ```html
-<script src="https://cdn.ucoder.in/insight-core@latest/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ucoder-insight@latest/dist/index.global.js"></script>
 ```
 
 ---
@@ -71,9 +71,9 @@ Sign up at [insights.ucoder.in](https://insights.ucoder.in) and get your trackin
 #### JavaScript / TypeScript
 
 ```typescript
-import { initProject } from "@ucoder/insight-core";
+import { initUcoderInsight } from "ucoder-insight";
 
-initProject("YOUR_TRACKING_ID", {
+initUcoderInsight("YOUR_TRACKING_ID", {
   notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
 });
 ```
@@ -82,11 +82,11 @@ initProject("YOUR_TRACKING_ID", {
 
 ```jsx
 import { useEffect } from "react";
-import { initProject } from "@ucoder/insight-core";
+import { initUcoderInsight } from "ucoder-insight";
 
 function App() {
   useEffect(() => {
-    initProject("YOUR_TRACKING_ID", {
+    initUcoderInsight("YOUR_TRACKING_ID", {
       notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
     });
   }, []);
@@ -99,11 +99,11 @@ function App() {
 
 ```typescript
 // app/layout.tsx
-import { initProject } from '@ucoder/insight-core';
+import { initUcoderInsight } from 'ucoder-insight';
 
 export default function RootLayout({ children }) {
   if (typeof window !== 'undefined') {
-    initProject("YOUR_TRACKING_ID", {
+    initUcoderInsight("YOUR_TRACKING_ID", {
       notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
     });
   }
@@ -121,10 +121,10 @@ export default function RootLayout({ children }) {
 ```javascript
 // main.js
 import { createApp } from "vue";
-import { initProject } from "@ucoder/insight-core";
+import { initUcoderInsight } from "ucoder-insight";
 import App from "./App.vue";
 
-initProject("YOUR_TRACKING_ID", {
+initUcoderInsight("YOUR_TRACKING_ID", {
   notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
 });
 
@@ -137,11 +137,11 @@ createApp(App).mount("#app");
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://cdn.ucoder.in/insight-core@latest/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ucoder-insight@latest/dist/index.global.js"></script>
   </head>
   <body>
     <script>
-      UcoderInsight.initProject("YOUR_TRACKING_ID", {
+      UcoderInsight.init("YOUR_TRACKING_ID", {
         notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
       });
     </script>
@@ -156,7 +156,7 @@ createApp(App).mount("#app");
 ### Track Custom Events
 
 ```typescript
-import { trackCustomEvent } from "@ucoder/insight-core";
+import { trackCustomEvent } from "ucoder-insight";
 
 // Simple event
 trackCustomEvent("button_click");
@@ -171,7 +171,7 @@ trackCustomEvent("button_click");
 
 ```
 
-## 📊 Dashboard Features
+## Dashboard Features
 
 Visit [insights.ucoder.in](https://insights.ucoder.in) to access:
 
@@ -184,7 +184,7 @@ Visit [insights.ucoder.in](https://insights.ucoder.in) to access:
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) first.
 
@@ -214,13 +214,13 @@ Found a bug? Please open an issue on [GitHub](https://github.com/soumydip/ucoder
 
 ---
 
-## 💬 Support
+##  Support
 
 -  [Documentation](https://insights.ucoder.in/docs)
 -  Email: support@ucoder.in
 ---
 
-## 📄 License
+##  License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
@@ -234,17 +234,17 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🔗 Links
+##  Links
 
 - **GitHub**: [github.com/soumydip/ucoder_insight_core](https://github.com/soumydip/ucoder_insight_core)
-- **npm**: [@ucoder/insight-core](https://www.npmjs.com/package/@ucoder/insight-core)
+- **npm**: [ucoder-insight](https://www.npmjs.com/package/ucoder-insight)
 - **Dashboard**: [insights.ucoder.in](https://insights.ucoder.in)
 - **Documentation**: [insights.ucoder.in/docs](https://insights.ucoder.in/docs)
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ by <a href="https://ucoder.in">UCoder</a></p>
+  <p>Made with ❤️ by <a href="https://www.ucoder.in">UCoder</a></p>
   <p>
     <a href="https://github.com/soumydip/ucoder_insight_core">⭐ Star us on GitHub</a>
   </p>
