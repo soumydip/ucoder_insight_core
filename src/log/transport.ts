@@ -5,15 +5,7 @@ import {
   deleteSpecificBatches,
   getOfflineDataCount,
 } from "../db/cache.offline";
-import {
-  isLocalhost,
-  isTestingMode,
-  shouldLogToConsole,
-  shouldSendToAPI,
-  envLog,
-  debugLog,
-  getEnvironmentLabel,
-} from "../utils/environment";
+import { shouldLogToConsole } from "../utils/environment";
 
 const API_URL = "https://insight-api.ucoder.in/event/log";
 
@@ -31,7 +23,6 @@ export const isLogEnabled = (): boolean => {
   return true;
 };
 
-// Manual override
 let manualOverride: boolean | null = null;
 
 export const setLogEnabled = (enabled: boolean) => {
@@ -47,24 +38,20 @@ export const isLoggingAllowed = (): boolean => {
   return isLogEnabled();
 };
 
-/**
- *  Send events using Beacon API or Fetch
- */
 export const sendEvents = async (batch: any[]) => {
   if (!isLoggingAllowed()) {
-    console.warn(" SDK not configured or logging disabled. Batch dropped.");
+    console.warn("SDK not configured or logging disabled. Batch dropped.");
     return;
   }
 
   if (!analyticsCache.projectId) {
-    console.warn(" SDK: Project ID missing, dropping batch.");
+    console.warn("SDK: Project ID missing, dropping batch.");
     return;
   }
 
-  //  Testing Mode or Localhost - Log to console only
+  // Debug mode - console only, no API
   if (shouldLogToConsole()) {
-    envLog("Logging to console instead of API");
-    console.log(" Analytics Events:", {
+    console.log("[Debug Mode] Analytics Events:", {
       projectId: analyticsCache.projectId,
       eventsCount: batch.length,
       timestamp: new Date().toISOString(),
@@ -76,7 +63,7 @@ export const sendEvents = async (batch: any[]) => {
   // Offline handling
   if (!navigator.onLine) {
     if (SDKConfigCache.cacheOffline) {
-      debugLog("Device Offline. Saving to DB.");
+      console.log("Device Offline. Saving to DB.");
       await saveOfflineBatch(batch);
     }
     return;
@@ -88,7 +75,6 @@ export const sendEvents = async (batch: any[]) => {
   };
 
   try {
-    //  Try sendBeacon first
     if (navigator.sendBeacon && typeof navigator.sendBeacon === "function") {
       const blob = new Blob([JSON.stringify(payload)], {
         type: "application/json",
@@ -97,14 +83,12 @@ export const sendEvents = async (batch: any[]) => {
       const beaconSent = navigator.sendBeacon(API_URL, blob);
 
       if (beaconSent) {
-        debugLog(" Batch sent via Beacon API");
         return;
       } else {
         console.warn("Beacon API failed, falling back to fetch");
       }
     }
 
-    //  Fallback to fetch
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -119,32 +103,25 @@ export const sendEvents = async (batch: any[]) => {
     const result = await response.json();
 
     if (!result.success) {
-      console.error(" Server Rejected Data:", result.message);
+      console.error("Server Rejected Data:", result.message);
       return;
     }
-
-    debugLog(" Batch sent successfully via fetch");
   } catch (error) {
     if (SDKConfigCache.cacheOffline) {
-      console.warn(" Network/Server failed. Saving to Offline DB.");
+      console.warn("Network/Server failed. Saving to Offline DB.");
       await saveOfflineBatch(batch);
     } else {
-      console.error(" Failed to send events:", error);
+      console.error("Failed to send events:", error);
     }
   }
 };
 
-/**
- *  Process offline queue
- */
 const processOfflineQueue = async (): Promise<boolean> => {
   if (!isLoggingAllowed()) {
     return false;
   }
 
-  //  Skip API calls in testing mode or localhost
   if (shouldLogToConsole()) {
-    debugLog("Skipping offline queue sync");
     return false;
   }
 
@@ -164,8 +141,6 @@ const processOfflineQueue = async (): Promise<boolean> => {
 
     const allOfflineEvents = offlineRecords.flatMap((r: any) => r.events);
     const batchIdsToDelete = offlineRecords.map((r: any) => r.id);
-
-    debugLog(` Syncing ${offlineRecords.length} offline batches...`);
 
     const payload = {
       projectId: analyticsCache.projectId,
@@ -187,15 +162,14 @@ const processOfflineQueue = async (): Promise<boolean> => {
 
     if (result.success) {
       await deleteSpecificBatches(batchIdsToDelete);
-      debugLog(" Offline Sync Successful!");
       return true;
     } else {
-      console.error(" Data Rejected. Deleting bad batches.");
+      console.error("Data Rejected. Deleting bad batches.");
       await deleteSpecificBatches(batchIdsToDelete);
       return true;
     }
   } catch (error) {
-    console.error(" Sync Failed (Network Error). Will retry later.");
+    console.error("Sync Failed (Network Error). Will retry later.");
     return false;
   } finally {
     isSyncing = false;
@@ -210,7 +184,6 @@ export const startBackgroundSync = async () => {
       nextDelay = 30000;
     } else if (shouldLogToConsole()) {
       nextDelay = 10000;
-      debugLog("Background sync paused");
     } else if (navigator.onLine) {
       const pendingCount = await getOfflineDataCount();
 
@@ -224,7 +197,7 @@ export const startBackgroundSync = async () => {
       nextDelay = 5000;
     }
   } catch (error) {
-    console.error(" Background Sync Error:", error);
+    console.error("Background Sync Error:", error);
   }
 
   setTimeout(() => {

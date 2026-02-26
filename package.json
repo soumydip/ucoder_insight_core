@@ -1,6 +1,6 @@
 {
   "name": "ucoder-insight",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.3",
   "description": "A lightweight analytics SDK for React , Next.js, Valinla javascript or any SPA applications, designed to be easy to integrate and use.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

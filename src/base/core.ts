@@ -18,7 +18,7 @@ const isVanillaMode = isBrowser && !!(window as any).ucoderInsight;
 let isInitialized = false;
 
 // Initialize the project with given project ID and optional user config
-export async function initProject(
+export async function initUcoderInsight(
   projectId: string,
   userConfig?: NotTrackPageConfig,
 ) {

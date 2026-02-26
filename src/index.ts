@@ -1,9 +1,9 @@
-import { initProject } from "./base/core";
+import { initUcoderInsight } from "./base/core";
 import { trackCustomEvent } from "./events/custom.event";
 import { customEventConfig } from "./interface/event.interface";
 
 export type { NotTrackPageConfig } from "./interface/event.interface";
-export { initProject, trackCustomEvent };
+export { initUcoderInsight, trackCustomEvent };
 
 // Global flags
 let isVanillaJS = false;
@@ -33,7 +33,7 @@ if (typeof window !== "undefined") {
     init: async (projectId: string, options = {}) => {
       console.log(" [Ucoder Insight] Initializing in Vanilla JS mode...");
 
-      const config = await initProject(projectId, options);
+      const config = await initUcoderInsight(projectId, options);
 
       if (config) {
         isReady = true;

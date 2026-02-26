@@ -109,10 +109,10 @@ interface customEventConfig {
     additionalData?: Record<string, string | number | boolean | null | undefined>;
 }
 
-declare function initProject(projectId: string, userConfig?: NotTrackPageConfig): Promise<TrackerConfig | null>;
+declare function initUcoderInsight(projectId: string, userConfig?: NotTrackPageConfig): Promise<TrackerConfig | null>;
 
 declare const trackCustomEvent: (config: customEventConfig) => void;
 
 declare let isVanillaJS: boolean;
 
-export { type NotTrackPageConfig, initProject, isVanillaJS, trackCustomEvent };
+export { type NotTrackPageConfig, initUcoderInsight, isVanillaJS, trackCustomEvent };

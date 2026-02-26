@@ -153,7 +153,7 @@
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const response = await fetch(
-          `http://localhost:5000/project/SDK-config/${projectId}`
+          `https://insight-api.ucoder.in/project/SDK-config/${projectId}`
         );
         const result = await response.json();
         if (result.success === false) {
@@ -478,11 +478,6 @@
   };
 
   // src/utils/environment.ts
-  var isLocalhost = () => {
-    if (typeof window === "undefined") return false;
-    const hostname = window.location.hostname;
-    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]" || hostname.startsWith("192.168.") || hostname.startsWith("10.") || hostname.endsWith(".local");
-  };
   var isTestingMode = () => {
     return optionalConfigCache.debug === true;
   };
@@ -490,45 +485,7 @@
     if (isTestingMode()) {
       return true;
     }
-    if (isLocalhost() && optionalConfigCache.debug !== false) {
-      return true;
-    }
     return false;
-  };
-  var getEnvironment = () => {
-    if (isTestingMode()) {
-      return "testing";
-    }
-    if (isLocalhost()) {
-      return "localhost";
-    }
-    return "production";
-  };
-  var getEnvironmentLabel = () => {
-    const env = getEnvironment();
-    switch (env) {
-      case "testing":
-        return "Testing Mode";
-      case "localhost":
-        return "Localhost";
-      case "production":
-        return "Production";
-      default:
-        return "Unknown";
-    }
-  };
-  var envLog = (message, data) => {
-    const label = getEnvironmentLabel();
-    if (data) {
-      console.log(`${label} ${message}`, data);
-    } else {
-      console.log(`${label} ${message}`);
-    }
-  };
-  var debugLog = (message, data) => {
-    if (shouldLogToConsole() && !SDKConfigCache.projectId) {
-      envLog(message, data);
-    }
   };
 
   // src/log/transport.ts
@@ -551,16 +508,15 @@
   };
   var sendEvents = async (batch) => {
     if (!isLoggingAllowed()) {
-      console.warn(" SDK not configured or logging disabled. Batch dropped.");
+      console.warn("SDK not configured or logging disabled. Batch dropped.");
       return;
     }
     if (!analyticsCache.projectId) {
-      console.warn(" SDK: Project ID missing, dropping batch.");
+      console.warn("SDK: Project ID missing, dropping batch.");
       return;
     }
     if (shouldLogToConsole()) {
-      envLog("Logging to console instead of API");
-      console.log(" Analytics Events:", {
+      console.log("[Debug Mode] Analytics Events:", {
         projectId: analyticsCache.projectId,
         eventsCount: batch.length,
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
@@ -570,7 +526,7 @@
     }
     if (!navigator.onLine) {
       if (SDKConfigCache.cacheOffline) {
-        debugLog("Device Offline. Saving to DB.");
+        console.log("Device Offline. Saving to DB.");
         await saveOfflineBatch(batch);
       }
       return;
@@ -586,7 +542,6 @@
         });
         const beaconSent = navigator.sendBeacon(API_URL, blob);
         if (beaconSent) {
-          debugLog(" Batch sent via Beacon API");
           return;
         } else {
           console.warn("Beacon API failed, falling back to fetch");
@@ -603,16 +558,15 @@
       }
       const result = await response.json();
       if (!result.success) {
-        console.error(" Server Rejected Data:", result.message);
+        console.error("Server Rejected Data:", result.message);
         return;
       }
-      debugLog(" Batch sent successfully via fetch");
     } catch (error) {
       if (SDKConfigCache.cacheOffline) {
-        console.warn(" Network/Server failed. Saving to Offline DB.");
+        console.warn("Network/Server failed. Saving to Offline DB.");
         await saveOfflineBatch(batch);
       } else {
-        console.error(" Failed to send events:", error);
+        console.error("Failed to send events:", error);
       }
     }
   };
@@ -1555,7 +1509,7 @@
   var isBrowser = typeof window !== "undefined";
   var isVanillaMode = isBrowser && !!window.ucoderInsight;
   var isInitialized = false;
-  async function initProject(projectId, userConfig2) {
+  async function initUcoderInsight(projectId, userConfig2) {
     if (!isBrowser) {
       console.warn(
         " [Ucoder Insight] Cannot initialize in non-browser environment"
@@ -1656,7 +1610,7 @@
       // Initialize
       init: async (projectId, options = {}) => {
         console.log(" [Ucoder Insight] Initializing in Vanilla JS mode...");
-        const config = await initProject(projectId, options);
+        const config = await initUcoderInsight(projectId, options);
         if (config) {
           isReady = true;
           processQueue();
