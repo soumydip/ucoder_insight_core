@@ -1,7 +1,7 @@
 {
   "name": "ucoder-insight",
-  "version": "0.1.0",
-  "description": "A lightweight analytics SDK for React , Next.js, Valinla javascript or any SPA applications, designed to be easy to integrate and use.",
+  "version": "0.1.1-beta.1",
+  "description": "A privacy-first, cookie-free, and lightweight web analytics SDK for React, Next.js, Vanilla JavaScript, and SPA applications. Developer-friendly and easy to integrate.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "browser": "dist/index.global.js",
@@ -11,15 +11,24 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean",
-    "dev": " src/index.ts",
+    "dev": "tsup src/index.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "analytics",
+    "web-analytics",
     "tracking",
-    "react",
-    "nextjs",
-    "sdk"
+    "react-analytics",
+    "nextjs-analytics",
+    "privacy-first",
+    "cookie-free",
+    "events-tracker",
+    "performance-monitoring",
+    "web-vitals",
+    "spa-analytics",
+    "sdk",
+    "ucoder",
+    "ucoder-insight"
   ],
   "author": "Ucoder",
   "license": "MIT",

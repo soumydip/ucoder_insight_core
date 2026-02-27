@@ -25,5 +25,5 @@ export const SDKConfigCache = {
 };
 
 export const optionalConfigCache = {
-  debug: true as boolean,
+  debug: false as boolean,
 }

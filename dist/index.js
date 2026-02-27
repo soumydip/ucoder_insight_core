@@ -104,7 +104,7 @@ var SDKConfigCache = {
   allowDomins: []
 };
 var optionalConfigCache = {
-  debug: true
+  debug: false
 };
 
 // src/config/resolveConfig.ts
