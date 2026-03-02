@@ -1,0 +1,23 @@
+# Source code and configs (Users only need the compiled dist/ folder)
+src/
+tests/
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+
+# GitHub and Community files (Not needed in NPM package)
+.github/
+.git/
+.gitignore
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+
+# Logs and Env variables
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+.env
+.env.local
+
+# NOTE: dist/, README.md, LICENSE and package.json will automatically be included!

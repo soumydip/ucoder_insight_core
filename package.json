@@ -1,6 +1,6 @@
 {
   "name": "ucoder-insight",
-  "version": "0.1.1-beta.1",
+  "version": "1.0.0",
   "description": "A privacy-first, cookie-free, and lightweight web analytics SDK for React, Next.js, Vanilla JavaScript, and SPA applications. Developer-friendly and easy to integrate.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -33,7 +33,7 @@
   "author": "Ucoder",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^24.10.2",
+    "@types/node": "^24.10.15",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },

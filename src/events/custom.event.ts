@@ -7,12 +7,10 @@ import { analyticsCache, SDKConfigCache } from "../loader/analyticsCache";
 export const trackCustomEvent = (config: customEventConfig) => {
   //  Check if custom event tracking is enabled
   if (!SDKConfigCache.trackCustomEvents) {
-    console.log(" Custom event tracking is disabled");
     return;
   }
 
   if (!config.event_name) {
-    console.error(" Event name is required for tracking custom event.");
     return;
   }
 
@@ -34,7 +32,7 @@ export const trackCustomEvent = (config: customEventConfig) => {
     EventType.CUSTOM,
     ActionType.CUSTOM,
     {
-      element: config.event_name, //  Use event name instead of "custom_event"
+      element: config.event_name,
       key: `custom_event:${normalizedPage}:${config.event_name}`,
       page: normalizedPage,
       tag: "custom",
@@ -43,5 +41,5 @@ export const trackCustomEvent = (config: customEventConfig) => {
     customEventDataPayload,
   );
 
-  console.log("📊 Custom event tracked:", config.event_name);
+  // console.log(" Custom event tracked:", config.event_name);
 };

@@ -133,7 +133,6 @@ var decodeData = (base64String) => {
     const payload = JSON.parse(decodedString);
     const calculatedChecksum = generateChecksum(payload.d);
     if (calculatedChecksum !== payload.s) {
-      console.warn("SDK: Config Tampered! Ignoring local cache.");
       return null;
     }
     return JSON.parse(payload.d);
@@ -184,7 +183,6 @@ async function resolveConfig(projectId, userConfig2) {
     }
   }
   if (!remoteData) {
-    console.log("[Ucoder Insight] Fetching config from Server...");
     remoteData = await fetchRemoteConfig(projectId);
     if (remoteData) {
       try {
@@ -193,7 +191,6 @@ async function resolveConfig(projectId, userConfig2) {
           data: remoteData
         };
         localStorage.setItem(CACHE_KEY, encodeData(payload));
-        console.log("[Ucoder Insight] Config cached successfully");
       } catch (e) {
         console.warn(" Unable to save config to cache.");
       }
@@ -450,9 +447,6 @@ var saveOfflineBatch = async (batch) => {
     countRequest.onsuccess = () => {
       const currentCount = countRequest.result;
       if (currentCount >= MAX_BATCH_LIMIT) {
-        console.warn(
-          ` Offline Storage Full (${MAX_BATCH_LIMIT} batches). Dropping new data to preserve old logs.`
-        );
         return;
       }
       const record = {
@@ -461,13 +455,10 @@ var saveOfflineBatch = async (batch) => {
         events: batch
       };
       store.put(record);
-      console.log("Offline Batch Saved.");
     };
     countRequest.onerror = () => {
-      console.error("Error checking DB count");
     };
   } catch (error) {
-    console.error(" Failed to save offline:", error);
   }
 };
 
@@ -595,7 +586,7 @@ var log = (eventType, actionType, rawData, devicesDetails, customData) => {
 var counter = 0;
 var lastReset = Date.now();
 function allowLog() {
-  const limit = 10;
+  const limit = 15;
   const windowMs = 1e4;
   const now = Date.now();
   if (now - lastReset > windowMs) {
@@ -604,9 +595,6 @@ function allowLog() {
   }
   if (counter >= limit) {
     if (counter === limit) {
-      console.warn(
-        ` Rate Limit Exceeded: Max ${limit} events per ${windowMs}ms`
-      );
     }
     return false;
   }
@@ -674,12 +662,10 @@ function isNotTrackPage(currentPath2) {
     if (configPath.endsWith("*")) {
       configPath = configPath.slice(0, -1);
       if (currentPathLower.startsWith(configPath)) {
-        console.log("Not tracking page (wildcard):", currentPathLower, configPath);
         return true;
       }
     } else {
       if (currentPathLower === configPath) {
-        console.log("Not tracking page (exact):", currentPathLower);
         return true;
       }
     }
@@ -693,11 +679,9 @@ var lastEventTime = 0;
 var CLICK_DEBOUNCE_MS = 300;
 function registerClickEvent(page) {
   if (!SDKConfigCache.trackClicks) {
-    console.log(" Click tracking is disabled");
     return;
   }
   if (isNotTrackPage(page) || is404Page(page)) {
-    console.log(" Click tracking is disabled for this page:", page);
     return;
   }
   const selector = buildSelector();
@@ -709,7 +693,6 @@ function registerClickEvent(page) {
     const name = getElementName(element);
     const tag = element.tagName.toLowerCase();
     if (!shouldTrackElement(element)) {
-      console.log(" Click not tracked for element:", name, "tag:", tag);
       return;
     }
     const key = `click:${page}:${name}`;
@@ -751,7 +734,6 @@ function startLogReporter(intervalMs = 5e3, onBatchReady) {
     if (batch.length > 0) {
       onBatchReady?.(batch);
       sendEvents(batch);
-      console.log(" Sending Batch:", batch.length, "events");
     }
     keys.forEach((k) => delete logBuffer[k]);
   }, intervalMs);
@@ -880,7 +862,6 @@ var handleUnhandledRejection = (event) => {
 };
 function registerErrorTracking() {
   if (!SDKConfigCache.trackErrors) {
-    console.log(" Error tracking is disabled");
     return;
   }
   if (is404Page(location.pathname) || isNotTrackPage(location.pathname)) {
@@ -988,7 +969,6 @@ function trackPageEnter(rawPage) {
         timestamp: Date.now()
       }
     });
-    console.log("\u{1F4CD} Page View Tracked:", normalizedPage);
   }, DEBOUNCE_DELAY_MS);
 }
 function trackPageExit() {
@@ -1012,21 +992,17 @@ function trackPageExit() {
       timestamp: Date.now()
     }
   });
-  console.log(`\u23F1\uFE0F Page Exit: ${currentPage} (${Math.round(duration / 1e3)}s)`);
   currentPage = "";
   pageStartTime = 0;
 }
 function enableAutoPageTracking() {
   if (isTrackingInitialized) {
-    console.warn("\u26A0\uFE0F Page tracking already initialized.");
     return;
   }
   if (!SDKConfigCache.trackPageViews) {
-    console.log("\u{1F6AB} Page tracking disabled in config.");
     return;
   }
   isTrackingInitialized = true;
-  console.log("\u{1F680} Auto Page Tracking Initialized (Universal Mode)");
   const handleInitialLoad = () => {
     trackPageEnter(location.pathname + location.search);
   };
@@ -1094,7 +1070,6 @@ var startNewPageTimer = () => {
   }
   activationTimer = setTimeout(() => {
     isTrackingActive = true;
-    console.log(" Scroll tracking activated for:", currentPath);
   }, ACTIVATION_DELAY);
 };
 var sendScrollLog = (path) => {
@@ -1111,7 +1086,6 @@ var sendScrollLog = (path) => {
   const winHeight = window.innerHeight;
   const totalScrollable = docHeight - winHeight;
   if (totalScrollable <= 0) {
-    console.log(" Page is not scrollable, skipping scroll log");
     return;
   }
   const scrolledPixels = Math.round(totalScrollable * (maxScrollDepth / 100));
@@ -1131,7 +1105,6 @@ var sendScrollLog = (path) => {
       type: "scroll_summary"
     }
   });
-  console.log(`\u{1F4CA} Scroll logged: ${maxScrollDepth}% on ${path}`);
 };
 var handleScrollLogic = () => {
   if (!isTrackingActive) return;
@@ -1157,7 +1130,6 @@ var handleScrollLogic = () => {
 var handleRouteChange = () => {
   const newPath = normalizeUrl(window.location.pathname);
   if (currentPath && currentPath !== newPath) {
-    console.log(`\u{1F504} Route changed: ${currentPath} \u2192 ${newPath}`);
     sendScrollLog(currentPath);
     currentPath = newPath;
     startNewPageTimer();
@@ -1212,7 +1184,6 @@ var registerScrollTracker = () => {
       sendScrollLog(currentPath);
     }
   });
-  console.log(" Scroll tracker initialized");
   return () => {
     window.removeEventListener("scroll", handleScroll);
     window.removeEventListener("popstate", handleRouteChange);
@@ -1224,11 +1195,9 @@ var registerScrollTracker = () => {
 import { onLCP, onCLS, onINP, onFCP, onTTFB } from "web-vitals";
 function registerPerformanceTracking() {
   if (!SDKConfigCache.trackPerformance) {
-    console.log(" Performance tracking is disabled");
     return;
   }
   if (isNotTrackPage(location.pathname) || is404Page(location.pathname)) {
-    console.log(" Performance tracking is disabled for this page:", location.pathname);
     return;
   }
   const sendAnalyticsMetric = (metric) => {
@@ -1250,7 +1219,6 @@ function registerPerformanceTracking() {
         rating: metric.rating
       }
     });
-    console.log(`Performance metric: ${metricName} = ${value}ms`);
   };
   try {
     onLCP(sendAnalyticsMetric);
@@ -1258,9 +1226,7 @@ function registerPerformanceTracking() {
     onINP(sendAnalyticsMetric);
     onFCP(sendAnalyticsMetric);
     onTTFB(sendAnalyticsMetric);
-    console.log(" Performance tracking initialized");
   } catch (error) {
-    console.error(" Error initializing performance tracking:", error);
   }
 }
 
@@ -1279,9 +1245,11 @@ async function initUcoderInsight(projectId, userConfig2) {
     console.warn(" [Ucoder Insight] SDK is already initialized!");
     return null;
   }
-  console.log("[Ucoder Insight] Initializing...");
-  console.log("   Mode:", isVanillaMode ? "Vanilla JS" : "Framework");
-  console.log("   Project ID:", projectId);
+  if (isTestingMode()) {
+    console.log("[Ucoder Insight] Initializing...");
+    console.log("   Mode:", isVanillaMode ? "Vanilla JS" : "Framework");
+    console.log("   Project ID:", projectId);
+  }
   if (userConfig2) {
     configureTracker(userConfig2);
   }
@@ -1307,18 +1275,21 @@ async function initUcoderInsight(projectId, userConfig2) {
   if (config.trackErrors) registerErrorTracking();
   if (config.trackPerformance) registerPerformanceTracking();
   startLogReporter(config.sendInterval);
-  console.log("[Ucoder Insight] Initialized successfully!");
+  if (isTestingMode()) {
+    console.log(
+      "[Ucoder Insight] Initialization Complete with Config:",
+      config
+    );
+  }
   return config;
 }
 
 // src/events/custom.event.ts
 var trackCustomEvent = (config) => {
   if (!SDKConfigCache.trackCustomEvents) {
-    console.log(" Custom event tracking is disabled");
     return;
   }
   if (!config.event_name) {
-    console.error(" Event name is required for tracking custom event.");
     return;
   }
   const rawPage = window.location.pathname;
@@ -1338,7 +1309,6 @@ var trackCustomEvent = (config) => {
     "custom" /* CUSTOM */,
     {
       element: config.event_name,
-      //  Use event name instead of "custom_event"
       key: `custom_event:${normalizedPage}:${config.event_name}`,
       page: normalizedPage,
       tag: "custom",
@@ -1346,7 +1316,6 @@ var trackCustomEvent = (config) => {
     },
     customEventDataPayload
   );
-  console.log("\u{1F4CA} Custom event tracked:", config.event_name);
 };
 
 // src/index.ts
@@ -1363,7 +1332,6 @@ var processQueue = () => {
 if (typeof window !== "undefined") {
   isVanillaJS = true;
   window.ucoderInsight = {
-    version: "1.0.0",
     isReady: () => isReady,
     isVanilla: () => isVanillaJS,
     // Initialize
@@ -1378,10 +1346,6 @@ if (typeof window !== "undefined") {
     },
     track: (config) => {
       if (!isReady) {
-        console.log(
-          " [Ucoder Insight] SDK initializing, event queued:",
-          config.event_name
-        );
         eventQueue.push(config);
         return;
       }

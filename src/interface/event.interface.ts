@@ -47,6 +47,19 @@ export const ADVANCED_EVENTS = ["iamge", "video", "audio", "scroll"] as const;
 /**
  * Configuration options for initializing the error tracking system.
  * @optional - It is help to customize the not found page path,not traking page. Otherwise, default settings will be applied.
+ * @option 
+ * `notFoundPath`: A string representing the custom path for the 'not found' page (e.g., '/404' or '/not-found'). Supports wildcard matching (e.g., '/error/*').
+ * 
+ * `notTrackPath`: A string or an array of strings representing page paths to exclude from tracking (e.g., ['/privacy', '/terms','/admin/*',]).
+ * 
+ * `debug`: A boolean flag to enable testing mode, which logs events to the console instead of sending them to the API. Useful for development and debugging. Not recommended for production use.
+  * @example
+  * ```typescript
+  * initUcoderInsight('your-project-id', {
+  * notFoundPath: '/404',
+  * notTrackPath: ['/privacy', '/terms','/admin/*',],
+  * debug: true
+  * });
  */
 export interface NotTrackPageConfig {
   /**
@@ -57,9 +70,9 @@ export interface NotTrackPageConfig {
   /**
    * Array of page paths to exclude from tracking (e.g., ['/privacy', '/terms','/admin/*',]).
    * @example
-   * ```javascript
-   * notTrackPages: ['/privacy', '/terms','/admin/*',] 
-   * ```  
+   * ```typescript
+   * notTrackPages: ['/privacy', '/terms','/admin/*',]
+   * ```
    */
 
   notTrackPath?: string | string[];
@@ -67,8 +80,7 @@ export interface NotTrackPageConfig {
   /**
    * Flag to enable testing mode, which logs events to the console instead of sending them to the API. Useful for development and debugging. Not recommended for production use.
    */
-  debug?: boolean; 
-  
+  debug?: boolean;
 }
 
 export interface NotTrackPage {}

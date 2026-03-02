@@ -16,9 +16,6 @@ let pageStartTime = 0;
 let enterTimeout: ReturnType<typeof setTimeout> | null = null;
 let isTrackingInitialized = false;
 
-// ==========================================
-// CORE TRACKING LOGIC
-// ==========================================
 
 function trackPageEnter(rawPage: string): void {
   // 1. Config Check
@@ -63,7 +60,7 @@ function trackPageEnter(rawPage: string): void {
       },
     });
 
-    console.log("📍 Page View Tracked:", normalizedPage);
+    // console.log(" Page View Tracked:", normalizedPage);
   }, DEBOUNCE_DELAY_MS);
 }
 
@@ -93,15 +90,12 @@ function trackPageExit(): void {
     },
   });
 
-  console.log(`⏱️ Page Exit: ${currentPage} (${Math.round(duration / 1000)}s)`);
+  // console.log(` Page Exit: ${currentPage} (${Math.round(duration / 1000)}s)`);
 
   currentPage = "";
   pageStartTime = 0;
 }
 
-// ==========================================
-// UNIVERSAL AUTO-DETECTION LOGIC
-// ==========================================
 
 /**
  * This function handles BOTH Vanilla JS and SPAs automatically.
@@ -111,17 +105,17 @@ function trackPageExit(): void {
 export function enableAutoPageTracking(): void {
   // Prevent double initialization
   if (isTrackingInitialized) {
-    console.warn("⚠️ Page tracking already initialized.");
+    // console.warn("Page tracking already initialized.");
     return;
   }
 
   if (!SDKConfigCache.trackPageViews) {
-    console.log("🚫 Page tracking disabled in config.");
+    // console.log(" Page tracking disabled in config.");
     return;
   }
 
   isTrackingInitialized = true;
-  console.log("🚀 Auto Page Tracking Initialized (Universal Mode)");
+  // console.log(" Auto Page Tracking Initialized (Universal Mode)");
 
   // ---------------------------------------------
   // 1. INITIAL LOAD (Works for SPA & Vanilla)

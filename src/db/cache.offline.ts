@@ -18,9 +18,9 @@ export const saveOfflineBatch = async (batch: any[]) => {
       const currentCount = countRequest.result;
 
       if (currentCount >= MAX_BATCH_LIMIT) {
-        console.warn(
-          ` Offline Storage Full (${MAX_BATCH_LIMIT} batches). Dropping new data to preserve old logs.`,
-        );
+        // console.warn(
+        //   ` Offline Storage Full (${MAX_BATCH_LIMIT} batches). Dropping new data to preserve old logs.`,
+        // );
         return;
       }
       // Proceed to save the batch
@@ -31,14 +31,14 @@ export const saveOfflineBatch = async (batch: any[]) => {
       };
 
       store.put(record);
-      console.log("Offline Batch Saved.");
+      // console.log("Offline Batch Saved.");
     };
 
     countRequest.onerror = () => {
-      console.error("Error checking DB count");
+      // console.error("Error checking DB count");
     };
   } catch (error) {
-    console.error(" Failed to save offline:", error);
+    // console.error(" Failed to save offline:", error);
   }
 };
 

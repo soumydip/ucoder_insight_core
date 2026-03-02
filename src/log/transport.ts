@@ -164,7 +164,7 @@ const processOfflineQueue = async (): Promise<boolean> => {
       await deleteSpecificBatches(batchIdsToDelete);
       return true;
     } else {
-      console.error("Data Rejected. Deleting bad batches.");
+      // console.error("Data Rejected. Deleting bad batches.");
       await deleteSpecificBatches(batchIdsToDelete);
       return true;
     }

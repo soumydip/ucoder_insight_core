@@ -8,12 +8,12 @@ import { is404Page, isNotTrackPage } from "../loader/notTrakingPath";
 export function registerPerformanceTracking() {
   //  Check if performance tracking is enabled
   if (!SDKConfigCache.trackPerformance) {
-    console.log(" Performance tracking is disabled");
+    // console.log(" Performance tracking is disabled");
     return;
   }
   
   if(isNotTrackPage(location.pathname)|| is404Page(location.pathname)){
-    console.log(" Performance tracking is disabled for this page:", location.pathname);
+    // console.log(" Performance tracking is disabled for this page:", location.pathname);
     return;
   }
 
@@ -40,7 +40,7 @@ export function registerPerformanceTracking() {
       },
     });
 
-    console.log(`Performance metric: ${metricName} = ${value}ms`);
+    // console.log(`Performance metric: ${metricName} = ${value}ms`);
   };
 
   try {
@@ -51,8 +51,8 @@ export function registerPerformanceTracking() {
     onFCP(sendAnalyticsMetric);
     onTTFB(sendAnalyticsMetric);
 
-    console.log(" Performance tracking initialized");
+    // console.log(" Performance tracking initialized");
   } catch (error) {
-    console.error(" Error initializing performance tracking:", error);
+    // console.error(" Error initializing performance tracking:", error);
   }
 }

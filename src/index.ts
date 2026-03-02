@@ -24,8 +24,6 @@ if (typeof window !== "undefined") {
   isVanillaJS = true;
 
   (window as any).ucoderInsight = {
-    version: "1.0.0",
-
     isReady: () => isReady,
     isVanilla: () => isVanillaJS,
 
@@ -46,10 +44,10 @@ if (typeof window !== "undefined") {
     track: (config: customEventConfig) => {
       //  If not ready, add to queue
       if (!isReady) {
-        console.log(
-          " [Ucoder Insight] SDK initializing, event queued:",
-          config.event_name,
-        );
+        // console.log(
+        //   " [Ucoder Insight] SDK initializing, event queued:",
+        //   config.event_name,
+        // );
         eventQueue.push(config);
         return;
       }

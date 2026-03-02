@@ -11,16 +11,17 @@ let lastEventKey = "";
 let lastEventTime = 0;
 const CLICK_DEBOUNCE_MS = 300;
 
+
 export function registerClickEvent(page: string) {
   //  Check if click tracking is enabled
   if (!SDKConfigCache.trackClicks) {
-    console.log(" Click tracking is disabled");
+    // console.log(" Click tracking is disabled");
     return;
   }
 
   // check is page is valid
   if (isNotTrackPage(page) || is404Page(page)) {
-    console.log(" Click tracking is disabled for this page:", page);
+    // console.log(" Click tracking is disabled for this page:", page);
     return;
   }
 
@@ -40,7 +41,7 @@ export function registerClickEvent(page: string) {
 
     // Check if tracking is disabled for this element
     if (!shouldTrackElement(element)) {
-      console.log(" Click not tracked for element:", name, "tag:", tag);
+      // console.log(" Click not tracked for element:", name, "tag:", tag);
       return;
     }
 

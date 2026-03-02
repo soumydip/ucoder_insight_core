@@ -94,7 +94,7 @@ const decodeData = (base64String: string): any => {
     const calculatedChecksum = generateChecksum(payload.d);
 
     if (calculatedChecksum !== payload.s) {
-      console.warn("SDK: Config Tampered! Ignoring local cache.");
+      // console.warn("SDK: Config Tampered! Ignoring local cache.");
       return null;
     }
 
@@ -164,7 +164,7 @@ export async function resolveConfig(
 
   if (!remoteData) {
     // if cache not found retry via network
-    console.log("[Ucoder Insight] Fetching config from Server...");
+    // console.log("[Ucoder Insight] Fetching config from Server...");
     remoteData = await fetchRemoteConfig(projectId);
 
     if (remoteData) {
@@ -174,7 +174,7 @@ export async function resolveConfig(
           data: remoteData,
         };
         localStorage.setItem(CACHE_KEY, encodeData(payload));
-        console.log("[Ucoder Insight] Config cached successfully");
+        // console.log("[Ucoder Insight] Config cached successfully");
       } catch (e) {
         console.warn(" Unable to save config to cache.");
       }

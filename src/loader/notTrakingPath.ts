@@ -74,12 +74,12 @@ export function isNotTrackPage(currentPath: string): boolean {
     if (configPath.endsWith("*")) {
       configPath = configPath.slice(0, -1);
       if (currentPathLower.startsWith(configPath)) {
-        console.log("Not tracking page (wildcard):", currentPathLower, configPath);
+        // console.log("Not tracking page (wildcard):", currentPathLower, configPath);
         return true;
       }
     } else {
       if (currentPathLower === configPath) {
-        console.log("Not tracking page (exact):", currentPathLower);
+        // console.log("Not tracking page (exact):", currentPathLower);
         return true;
       }
     }

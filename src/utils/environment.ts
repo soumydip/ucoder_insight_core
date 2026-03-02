@@ -10,3 +10,8 @@ export const shouldLogToConsole = (): boolean => {
   }
   return false;
 };
+
+
+export const isDevelopmentMode = (): boolean => {
+  return process.env.NODE_ENV === "development";
+}

@@ -4,6 +4,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "target": "ES2020",
+    "types": ["node"],
 
     /* Modules & Bundler Support */
     "module": "ES2020",

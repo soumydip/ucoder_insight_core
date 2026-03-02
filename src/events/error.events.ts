@@ -80,7 +80,7 @@ const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
 export function registerErrorTracking() {
   //  Check if error tracking is enabled
   if (!SDKConfigCache.trackErrors) {
-    console.log(" Error tracking is disabled");
+    // console.log(" Error tracking is disabled");
     return;
   }
 

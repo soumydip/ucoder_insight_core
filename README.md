@@ -1,18 +1,12 @@
 <div align="center">
-  <h1> UCoder Insight</h1>
+  <img src="https://insights.ucoder.in/your-logo-link.png" alt="UCoder Insight Logo" width="150" />
+  
+  <h1>UCoder Insight</h1>
   <p><strong>Powerful analytics and user insights tracking SDK for modern web applications</strong></p>
   
-  [![npm version](https://img.shields.io/npm/v/@ucoder/insight-core.svg)](https://www.npmjs.com/package/ucoder-insight)
-  [![npm downloads](https://img.shields.io/npm/dm/@ucoder/insight-core.svg)](https://www.npmjs.com/package/ucoder-insight)
+  [![npm version](https://img.shields.io/npm/v/ucoder-insight.svg)](https://www.npmjs.com/package/ucoder-insight)
+  [![npm downloads](https://img.shields.io/npm/dm/ucoder-insight.svg)](https://www.npmjs.com/package/ucoder-insight)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
-  
-  <p>
-    <a href="https://insights.ucoder.in"> Live Documentation</a> 
-    <a href="https://insights.ucoder.in"> Demo Dashboard</a> 
-    <a href="https://github.com/soumydip/ucoder_insight_core/issues"> Report Bug</a> •
-    <a href="https://github.com/soumydip/ucoder_insight_core/issues"> Request Feature</a>
-  </p>
 </div>
 
 ---
@@ -32,7 +26,7 @@
 
 ---
 
-##  Installation
+## Installation
 
 ### npm
 
@@ -97,20 +91,39 @@ function App() {
 
 #### Next.js (App Router)
 
-```typescript
+Create a client component for analytics first:
+
+```tsx
+// app/components/Analytics.tsx
+"use client";
+import { useEffect } from "react";
+import { initUcoderInsight } from "ucoder-insight";
+
+export default function Analytics() {
+  useEffect(() => {
+    initUcoderInsight("YOUR_TRACKING_ID", {
+      notTrackPath: ["/privacy", "/terms", "/admin/*"],
+      debug: process.env.NODE_ENV !== "production", // Optional: helps in local dev
+    });
+  }, []);
+
+  return null;
+}
+```
+
+Then include it in your root layout:
+
+```tsx
 // app/layout.tsx
-import { initUcoderInsight } from 'ucoder-insight';
+import Analytics from "./components/Analytics";
 
 export default function RootLayout({ children }) {
-  if (typeof window !== 'undefined') {
-    initUcoderInsight("YOUR_TRACKING_ID", {
-      notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
-    });
-  }
-
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
@@ -151,7 +164,7 @@ createApp(App).mount("#app");
 
 ---
 
-##  Usage
+## Usage
 
 ### Track Custom Events
 
@@ -162,29 +175,28 @@ import { trackCustomEvent } from "ucoder-insight";
 trackCustomEvent("button_click");
 
 // Event with properties
-    trackCustomEvent({
-      event_name: "email_input_clicked",
-      action_category: "interaction",
-      object_id: "email_input_field",
-      status: "success",
-    });
-
+trackCustomEvent({
+  event_name: "email_input_clicked",
+  action_category: "interaction",
+  object_id: "email_input_field",
+  status: "success",
+});
 ```
 
 ## Dashboard Features
 
 Visit [insights.ucoder.in](https://insights.ucoder.in) to access:
 
--  **Real-user Analytics** - Track real users 
--  **User Segments** - Create custom user segments
--  **Retention** - Analyze user retention rates
--  **Geo Analytics** - Location-based insights
--  **Device Breakdown** - Browser, OS, device stats
--  **Custom Reports** - Build your own reports
+- **Real-user Analytics** - Track real users
+- **User Segments** - Create custom user segments
+- **Retention** - Analyze user retention rates
+- **Geo Analytics** - Location-based insights
+- **Device Breakdown** - Browser, OS, device stats
+- **Custom Reports** - Build your own reports
 
 ---
 
-##  Contributing
+## Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) first.
 
@@ -196,13 +208,13 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ---
 
-##  Changelog
+## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+See [https://insights.ucoder.in/docs/changelog](https://insights.ucoder.in/docs/changelog) for release history.
 
 ---
 
-##  Bug Reports
+## Bug Reports
 
 Found a bug? Please open an issue on [GitHub](https://github.com/soumydip/ucoder_insight_core/issues) with:
 
@@ -214,19 +226,20 @@ Found a bug? Please open an issue on [GitHub](https://github.com/soumydip/ucoder
 
 ---
 
-##  Support
+## Support
 
--  [Documentation](https://insights.ucoder.in/docs)
--  Email: support@ucoder.in
+- [Documentation](https://insights.ucoder.in/docs)
+- Email: support@ucoder.in
+
 ---
 
-##  License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-##  Acknowledgments
+## Acknowledgments
 
 - Built with ❤️ by the UCoder team
 - Inspired by modern analytics tools
@@ -234,7 +247,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-##  Links
+## Links
 
 - **GitHub**: [github.com/soumydip/ucoder_insight_core](https://github.com/soumydip/ucoder_insight_core)
 - **npm**: [ucoder-insight](https://www.npmjs.com/package/ucoder-insight)

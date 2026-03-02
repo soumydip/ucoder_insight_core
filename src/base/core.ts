@@ -9,6 +9,7 @@ import { configureTracker } from "../loader/notTrakingPath";
 import { NotTrackPageConfig } from "../interface/event.interface";
 import { registerScrollTracker } from "../events/scroll.event";
 import { registerPerformanceTracking } from "../events/performence.event";
+import { isTestingMode } from "../utils/environment";
 
 // Check if running in browser
 const isBrowser = typeof window !== "undefined";
@@ -36,9 +37,11 @@ export async function initUcoderInsight(
     return null;
   }
 
-  console.log("[Ucoder Insight] Initializing...");
-  console.log("   Mode:", isVanillaMode ? "Vanilla JS" : "Framework");
-  console.log("   Project ID:", projectId);
+  if (isTestingMode()) {
+    console.log("[Ucoder Insight] Initializing...");
+    console.log("   Mode:", isVanillaMode ? "Vanilla JS" : "Framework");
+    console.log("   Project ID:", projectId);
+  }
 
   // Load user config first
   if (userConfig) {
@@ -82,7 +85,11 @@ export async function initUcoderInsight(
   // Start log reporter
   startLogReporter(config.sendInterval);
 
-  console.log("[Ucoder Insight] Initialized successfully!");
-
+  if (isTestingMode()) {
+    console.log(
+      "[Ucoder Insight] Initialization Complete with Config:",
+      config,
+    );
+  }
   return config;
 }

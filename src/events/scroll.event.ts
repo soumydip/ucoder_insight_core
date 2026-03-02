@@ -26,7 +26,7 @@ const startNewPageTimer = () => {
   // Activate scroll tracking after delay
   activationTimer = setTimeout(() => {
     isTrackingActive = true;
-    console.log(" Scroll tracking activated for:", currentPath);
+    // console.log(" Scroll tracking activated for:", currentPath);
   }, ACTIVATION_DELAY);
 };
 
@@ -51,7 +51,7 @@ const sendScrollLog = (path: string) => {
 
   //  Handle edge case: non-scrollable pages
   if (totalScrollable <= 0) {
-    console.log(" Page is not scrollable, skipping scroll log");
+    // console.log(" Page is not scrollable, skipping scroll log");
     return;
   }
 
@@ -74,7 +74,7 @@ const sendScrollLog = (path: string) => {
     },
   });
 
-  console.log(`📊 Scroll logged: ${maxScrollDepth}% on ${path}`);
+  // console.log(` Scroll logged: ${maxScrollDepth}% on ${path}`);
 };
 
 // Scroll event handler
@@ -115,7 +115,7 @@ const handleRouteChange = () => {
 
   // If page actually changed
   if (currentPath && currentPath !== newPath) {
-    console.log(`🔄 Route changed: ${currentPath} → ${newPath}`);
+    //console.log(`Route changed: ${currentPath} → ${newPath}`);
 
     // 1. Send previous page scroll data
     sendScrollLog(currentPath);
@@ -198,7 +198,7 @@ export const registerScrollTracker = () => {
     }
   });
 
-  console.log(" Scroll tracker initialized");
+  // console.log(" Scroll tracker initialized");
 
   //  Return cleanup function (for future use)
   return () => {
