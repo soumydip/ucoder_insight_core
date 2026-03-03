@@ -1,14 +1,22 @@
 {
   "name": "ucoder-insight",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A privacy-first, cookie-free, and lightweight web analytics SDK for React, Next.js, Vanilla JavaScript, and SPA applications. Developer-friendly and easy to integrate.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "browser": "dist/index.global.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./global": "./dist/index.global.js"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean",
     "dev": "tsup src/index.ts --watch",
