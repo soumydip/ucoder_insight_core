@@ -114,7 +114,7 @@ const fetchRemoteConfig = async (
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await fetch(
-        `https://insight-api.ucoder.in/project/SDK-config/${projectId}`,
+        `http://insight-api.ucoder.in/SDK-config/${projectId}`,
       );
       const result = await response.json();
       // if any error in response not config the project

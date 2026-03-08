@@ -7,8 +7,7 @@ import {
 } from "../db/cache.offline";
 import { shouldLogToConsole } from "../utils/environment";
 
-const API_URL = "https://insight-api.ucoder.in/event/log";
-
+const API_URL = "http://insight-api.ucoder.in/event/log";
 let isSyncing = false;
 
 export const isLogEnabled = (): boolean => {

@@ -19,6 +19,7 @@ export enum EventType {
  */
 export enum ActionType {
   UI_INTERACTION = "ui_interaction",
+  OUTBOUND_LINK = "outbound_link",
   NAVIGATION = "navigation",
   TIME_TRACKING = "time_tracking",
   ENGAGEMENT = "engagement",

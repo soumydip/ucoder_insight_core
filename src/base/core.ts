@@ -10,20 +10,22 @@ import { NotTrackPageConfig } from "../interface/event.interface";
 import { registerScrollTracker } from "../events/scroll.event";
 import { registerPerformanceTracking } from "../events/performence.event";
 import { isTestingMode } from "../utils/environment";
-
-// Check if running in browser
+import { isBot } from "../spam/isBot";
+//
 const isBrowser = typeof window !== "undefined";
 const isVanillaMode = isBrowser && !!(window as any).ucoderInsight;
 
-// check initialization status , to prevent multiple initializations ( when in localhost or dev environment, hot reloads may cause multiple inits)
+// race condition prevention variables
 let isInitialized = false;
+let isInitializing = false;
 
-// Initialize the project with given project ID and optional user config
+// cleanup functions for event listeners and trackers
+let cleanupFns: Array<() => void> = [];
+
 export async function initUcoderInsight(
   projectId: string,
   userConfig?: NotTrackPageConfig,
 ) {
-  // Environment check
   if (!isBrowser) {
     console.warn(
       " [Ucoder Insight] Cannot initialize in non-browser environment",
@@ -31,11 +33,23 @@ export async function initUcoderInsight(
     return null;
   }
 
-  // Check if already initialized
-  if (isInitialized) {
-    console.warn(" [Ucoder Insight] SDK is already initialized!");
+  // bot detection check - if it's a bot, skip initialization entirely
+  if (isBot()) {
+    console.warn(" [Ucoder Insight] Bot detected, initialization skipped.");
     return null;
   }
+
+  // race condition check! (if it's already initialized or initializing)
+  if (isInitialized || isInitializing) {
+    if (isTestingMode()) {
+      console.warn(
+        " [Ucoder Insight] SDK is already initialized or initializing!",
+      );
+    }
+    return null;
+  }
+
+  isInitializing = true; // initialization process started, set the flag to prevent
 
   if (isTestingMode()) {
     console.log("[Ucoder Insight] Initializing...");
@@ -43,53 +57,74 @@ export async function initUcoderInsight(
     console.log("   Project ID:", projectId);
   }
 
-  // Load user config first
+  // if user provided custom config, apply it before fetching server config (so that notTrackPath and debug mode can work immediately)
   if (userConfig) {
     configureTracker(userConfig);
-  }
-  if (userConfig?.debug) {
-    console.log(
-      " [Ucoder Insight] Running in Testing Mode - No data will be sent to server",
-    );
+    if (userConfig.debug) {
+      console.log(
+        " [Ucoder Insight] Running in Testing Mode - No data will be sent to server",
+      );
+    }
   }
 
-  // Try to fetch remote config
-  const config = await resolveConfig(projectId);
+  try {
+    // if config fetching fails, we should not proceed with initialization, but we should also release the lock (isInitializing) so that user can try again later without refreshing the page
+    const config = await resolveConfig(projectId);
 
-  // If config is null, stop initialization
-  if (!config) {
+    // if config is null or undefined, it means fetching failed or project ID is invalid, we should log an error and exit initialization gracefully
+
+    if (!config) {
+      console.error(
+        " [Ucoder Insight] Init Failed: Server Unreachable or Invalid Project ID",
+      );
+      isInitializing = false; // release the lock so that user can try again
+      return null;
+    }
+
+    isInitialized = true; // initialization successful, set the flag
+
+    // URL normalization for consistent page tracking (e.g. remove trailing slashes, lowercase, etc.)
+    const rawPage = location.pathname || "/";
+    const page = normalizeUrl(rawPage) ?? rawPage;
+
+    await loadUserToken();
+
+    // all trackers should be registered after config is successfully fetched, so that we can ensure the config is applied correctly (e.g. notTrackPath should work immediately without waiting for next page load)
+    if (config.trackClicks) cleanupFns.push(registerClickEvent(page) as any);
+    if (config.trackPageViews) cleanupFns.push(enableAutoPageTracking() as any);
+    if (config.trackScroll) cleanupFns.push(registerScrollTracker() as any);
+    if (config.trackErrors) cleanupFns.push(registerErrorTracking() as any);
+    if (config.trackPerformance) registerPerformanceTracking();
+
+    // start the log reporter
+    startLogReporter(config.sendInterval);
+
+    if (isTestingMode()) {
+      console.log(
+        "[Ucoder Insight] Initialization Complete with Config:",
+        config,
+      );
+    }
+
+    return config;
+  } catch (error) {
     console.error(
-      " [Ucoder Insight] Init Failed: Server Unreachable or Invalid Project ID",
+      " [Ucoder Insight] Critical error during initialization:",
+      error,
     );
-    return null;
+  } finally {
+    isInitializing = false;
   }
+}
 
-  // ceck is testing mode
-
-  isInitialized = true;
-
-  // Normalize current page URL
-  const rawPage = location.pathname || "/";
-  const page = normalizeUrl(rawPage) ?? rawPage;
-
-  // Load user token data from storage
-  await loadUserToken();
-
-  // Register event listeners based on config
-  if (config.trackClicks) registerClickEvent(page);
-  if (config.trackPageViews) enableAutoPageTracking();
-  if (config.trackScroll) registerScrollTracker();
-  if (config.trackErrors) registerErrorTracking();
-  if (config.trackPerformance) registerPerformanceTracking();
-
-  // Start log reporter
-  startLogReporter(config.sendInterval);
-
-  if (isTestingMode()) {
-    console.log(
-      "[Ucoder Insight] Initialization Complete with Config:",
-      config,
-    );
-  }
-  return config;
+export function stopUcoderInsight() {
+  if (!isInitialized) return;
+  // call all cleanup functions to remove event listeners and trackers need for future cleanup (e.g. if user wants to re-initialize with a different project ID or config without refreshing the page)
+  cleanupFns.forEach((fn) => {
+    if (typeof fn === "function") fn();
+  });
+  cleanupFns = [];
+  isInitialized = false;
+  if (isTestingMode())
+    console.log("[Ucoder Insight] Tracking stopped and cleaned up.");
 }
