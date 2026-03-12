@@ -11,6 +11,8 @@ import { registerScrollTracker } from "../events/scroll.event";
 import { registerPerformanceTracking } from "../events/performence.event";
 import { isTestingMode } from "../utils/environment";
 import { isBot } from "../spam/isBot";
+import { registerOutboundLinkEvent } from "../events/OutboundLink.event";
+import { optionalConfigCache } from "../loader/analyticsCache";
 //
 const isBrowser = typeof window !== "undefined";
 const isVanillaMode = isBrowser && !!(window as any).ucoderInsight;
@@ -47,6 +49,11 @@ export async function initUcoderInsight(
       );
     }
     return null;
+  }
+
+  // if debug mode is enabled in user config, we should log a warning that SDK is running in debug mode and no data will be sent to server (but events will still be tracked and logged in console for testing and debugging purposes)
+  if (userConfig?.debug) {
+    optionalConfigCache.debug = true;
   }
 
   isInitializing = true; // initialization process started, set the flag to prevent
@@ -91,6 +98,8 @@ export async function initUcoderInsight(
 
     // all trackers should be registered after config is successfully fetched, so that we can ensure the config is applied correctly (e.g. notTrackPath should work immediately without waiting for next page load)
     if (config.trackClicks) cleanupFns.push(registerClickEvent(page) as any);
+    if (config.trackPageViews)
+      cleanupFns.push(registerOutboundLinkEvent() as any);
     if (config.trackPageViews) cleanupFns.push(enableAutoPageTracking() as any);
     if (config.trackScroll) cleanupFns.push(registerScrollTracker() as any);
     if (config.trackErrors) cleanupFns.push(registerErrorTracking() as any);

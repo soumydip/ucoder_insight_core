@@ -114,7 +114,7 @@ const fetchRemoteConfig = async (
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await fetch(
-        `http://insight-api.ucoder.in/SDK-config/${projectId}`,
+        `https://insight-api.ucoder.in/project/SDK-config/${projectId}`,
       );
       const result = await response.json();
       // if any error in response not config the project
@@ -157,7 +157,7 @@ export async function resolveConfig(
   if (cached) {
     const now = Date.now();
     if (cached.data && now - cached.timestamp < CACHE_TTL) {
-      console.log(" [ Ucoder Insight ] Loaded config from Cache");
+      // console.log(" [ Ucoder Insight ] Loaded config from Cache");
       remoteData = cached.data;
     }
   }
@@ -235,8 +235,6 @@ export async function resolveConfig(
   analyticsCache.projectId = projectId;
   // update SDK cache
   updateSDKCache(finalConfig);
-
-  console.log(" SDK: Configuration resolved successfully");
 
   return finalConfig;
 }
