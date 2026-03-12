@@ -102,8 +102,6 @@ export function registerErrorTracking() {
   // Register unhandled promise rejections
   window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
-  console.log(" Error tracking initialized");
-
   // Return cleanup function
   return () => {
     window.removeEventListener("error", handleJsError);

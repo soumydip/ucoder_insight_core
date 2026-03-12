@@ -69,8 +69,6 @@ export function registerClickEvent(page: string) {
   // Add event listener
   document.addEventListener("click", handleClick, { passive: true });
 
-  console.log(" Click tracker initialized");
-
   // Return cleanup function
   return () => {
     document.removeEventListener("click", handleClick);

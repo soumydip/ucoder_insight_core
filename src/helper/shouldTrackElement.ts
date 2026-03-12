@@ -15,12 +15,12 @@ export function shouldTrackElement(el: HTMLElement): boolean {
   const attr = el.getAttribute("data-uca-track");
 
   if (attr === "false") {
-    console.log(" Element tracking disabled by developer:", el);
+    // console.log(" Element tracking disabled by developer:", el);
     return false; // NEVER track
   }
 
   if (attr === "true") {
-    console.log(" Element tracking forced by developer:", el);
+    // console.log(" Element tracking forced by developer:", el);
     return true; // ALWAYS track (even inputs if developer wants)
   }
 
@@ -53,7 +53,7 @@ export function shouldTrackElement(el: HTMLElement): boolean {
     ];
 
     if (sensitiveInputTypes.includes(inputType)) {
-      console.log(" Input field blocked (sensitive):", inputType);
+      // console.log(" Input field blocked (sensitive):", inputType);
       return false;
     }
 
@@ -61,18 +61,18 @@ export function shouldTrackElement(el: HTMLElement): boolean {
     const safeInputTypes = ["checkbox", "radio", "submit", "button", "reset"];
 
     if (safeInputTypes.includes(inputType)) {
-      console.log(" Safe input type allowed:", inputType);
+      // console.log(" Safe input type allowed:", inputType);
       return trackingElements[tag] === true;
     }
 
     // Default: block unknown input types
-    console.log(" Unknown input type blocked:", inputType);
+    // console.log(" Unknown input type blocked:", inputType);
     return false;
   }
 
   // NEVER track textarea (user-entered text)
   if (tag === "textarea") {
-    console.log("Textarea blocked (sensitive)");
+    // console.log("Textarea blocked (sensitive)");
     return false;
   }
 
@@ -80,7 +80,7 @@ export function shouldTrackElement(el: HTMLElement): boolean {
   if (tag === "select") {
     const isSensitive = el.hasAttribute("data-sensitive");
     if (isSensitive) {
-      console.log(" Select blocked (marked sensitive)");
+      // console.log(" Select blocked (marked sensitive)");
       return false;
     }
   }
@@ -91,9 +91,9 @@ export function shouldTrackElement(el: HTMLElement): boolean {
   const isAllowed = trackingElements[tag] === true;
 
   if (isAllowed) {
-    console.log(" Element allowed by config:", tag);
+    // console.log(" Element allowed by config:", tag);
   } else {
-    console.log(" Element not in tracking config:", tag);
+    // console.log(" Element not in tracking config:", tag);
   }
 
   return isAllowed;
