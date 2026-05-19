@@ -1,8 +1,43 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Source code - users need only dist/
+src/
+tests/
+coverage/
 
-# dependencies
-/node_modules
-/.pnp
+# Config files
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+*.tsbuildinfo
+next-env.d.ts
+
+# GitHub and community files
+.github/
+.gitignore
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+correctProduction.md
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+dist/
+
+# Env
+.env
+.env.local
+*.pem
+
+# OS
+.DS_Store
+
+# Package managers
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,31 +45,9 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-/out/
-
-# production
-/build
-/dist
-/dist/*
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-
-
-# vercel
+# Vercel
 .vercel
+out/
+build/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# NOTE: dist/, README.md, LICENSE, package.json auto-included!

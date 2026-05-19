@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://insights.ucoder.in/your-logo-link.png" alt="UCoder Insight Logo" width="150" />
+  <img src="https://insights.ucoder.in/icon.png" alt="UCoder Insight Logo" width="150" />
   
   <h1>UCoder Insight</h1>
   <p><strong>Powerful analytics and user insights tracking SDK for modern web applications</strong></p>
@@ -13,7 +13,7 @@
 
 ## Features
 
-- **Lightweight & Fast** - Minimal bundle size with zero dependencies
+- **Lightweight & Fast** - Minimal bundle size with no required dependencies
 - **Real-time Analytics** - Track user behavior, events, and custom metrics
 - **Privacy-First** - GDPR compliant with built-in consent management
 - **Custom Events** - Track anything from clicks to complex user journeys
@@ -23,6 +23,7 @@
 - **Advanced Insights** - User sessions, funnels, retention, and more
 - **Geo-location** - Automatic location detection and tracking
 - **Bot Detection** - Filters out bot traffic automatically
+- **Web Vitals** - Automatic performance tracking (LCP, CLS, INP, FCP, TTFB) when `web-vitals` is available
 
 ---
 
@@ -182,6 +183,24 @@ trackCustomEvent({
   status: "success",
 });
 ```
+
+---
+
+## Web Vitals (Performance Tracking)
+
+UCoder Insight automatically collects Web Vitals metrics (LCP, CLS, INP, FCP, TTFB) if `web-vitals` is available in your project.
+
+**React / Next.js users** — `web-vitals` comes pre-installed, so performance tracking works out of the box with zero extra setup.
+
+**Vanilla JS / other frameworks** — Install `web-vitals` manually to enable performance tracking:
+
+```bash
+npm install web-vitals
+```
+
+If `web-vitals` is not installed, all other tracking features (page views, custom events, sessions, etc.) will continue to work normally. Performance tracking is silently skipped.
+
+---
 
 ## Dashboard Features
 

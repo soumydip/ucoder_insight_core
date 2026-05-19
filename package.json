@@ -1,6 +1,7 @@
 {
   "name": "ucoder-insight",
-  "version": "1.1.1",
+  "version": "1.1.2",
+  "sideEffects": false,
   "description": "A privacy-first, cookie-free, and lightweight web analytics SDK for React, Next.js, Vanilla JavaScript, and SPA applications. Developer-friendly and easy to integrate.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -18,7 +19,7 @@
     "./global": "./dist/index.global.js"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean",
+    "build": "tsup src/index.ts --format cjs,esm,iife --dts --clean --treeshake --minify --global-name UcoderInsight",
     "dev": "tsup src/index.ts --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -40,12 +41,18 @@
   ],
   "author": "Ucoder",
   "license": "MIT",
+  "peerDependencies": {
+    "web-vitals": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "web-vitals": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@types/node": "^24.10.15",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
+    "typescript": "^5.9.3",
     "web-vitals": "^5.1.0"
   },
   "repository": {

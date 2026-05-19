@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.2] - 2026-05-19
+
+#### Patch Release
+
+- Moved `web-vitals` from `dependencies` to `peerDependencies` (optional)
+  to reduce bundle size. Performance tracking now uses dynamic import with
+  graceful fallback — if `web-vitals` is not available, tracking is silently
+  skipped without breaking the SDK.
+- React and Next.js users get Web Vitals tracking automatically (pre-installed).
+- Vanilla JS users can optionally install `web-vitals` to enable it.
+- Added `"sideEffects": false` for better tree-shaking support.
+- Added `--treeshake --minify` to build pipeline.
+- Added `--global-name UcoderInsight` for correct IIFE/CDN exports.
+- Bundle size ~25kb -> 20kb minified, ~9.3kb ->7-8 kb gzipped.
+
 ## [1.0.1] - 2026-03-03
 
 #### Bug Fixes
@@ -43,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **GDPR Compliance** — Privacy-first design with built-in consent management; no cookies or IP address collection.
 
 ## BETA Release ()
+
 - Initial beta release with core tracking features and basic analytics support. Feedback from early adopters will guide future enhancements and stability improvements.
 
 ##### Framework Support
