@@ -12,6 +12,7 @@ vitest.config.ts
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 SECURITY.md
+push.sh
 
 
 # Logs and Env variables

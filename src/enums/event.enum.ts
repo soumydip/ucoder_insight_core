@@ -26,6 +26,7 @@ export enum ActionType {
   FORM_INTERACTION = "form_interaction",
   PERFORMANCE = "performance",
   SYSTEM_ERROR = "system_error",
+  PAGE_PERFORMANCE = "page_performance",
   CUSTOM = "custom",
 }
 

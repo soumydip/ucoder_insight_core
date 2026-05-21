@@ -47,19 +47,19 @@ export const ADVANCED_EVENTS = ["iamge", "video", "audio", "scroll"] as const;
 /**
  * Configuration options for initializing the error tracking system.
  * @optional - It is help to customize the not found page path,not traking page. Otherwise, default settings will be applied.
- * @option 
+ * @option
  * `notFoundPath`: A string representing the custom path for the 'not found' page (e.g., '/404' or '/not-found'). Supports wildcard matching (e.g., '/error/*').
- * 
+ *
  * `notTrackPath`: A string or an array of strings representing page paths to exclude from tracking (e.g., ['/privacy', '/terms','/admin/*',]).
- * 
+ *
  * `debug`: A boolean flag to enable testing mode, which logs events to the console instead of sending them to the API. Useful for development and debugging. Not recommended for production use.
-  * @example
-  * ```typescript
-  * initUcoderInsight('your-project-id', {
-  * notFoundPath: '/404',
-  * notTrackPath: ['/privacy', '/terms','/admin/*',],
-  * debug: true
-  * });
+ * @example
+ * ```typescript
+ * initUcoderInsight('your-project-id', {
+ * notFoundPath: '/404',
+ * notTrackPath: ['/privacy', '/terms','/admin/*',],
+ * debug: true
+ * });
  */
 export interface NotTrackPageConfig {
   /**
@@ -144,4 +144,18 @@ export interface customEventConfig {
    * ```
    */
   additionalData?: Record<string, string | number | boolean | null | undefined>;
+}
+ 
+/**
+ * This interface defines the configuration options for tracking page performance. It allows you to specify which page paths should be excluded from performance tracking, helping to focus on relevant pages and avoid unnecessary data collection.
+ * @interface TrackPerformaceConfig
+ */
+export interface TrackPerformaceConfig {
+  /**
+   * A string or an array of strings representing page paths to exclude from performance tracking (e.g., ['/privacy', '/terms','/admin/*',]).
+   * @type {(string | string[])}
+   * @memberof TrackPerformaceConfig
+   * @optional
+   */
+  path?: string | string[];
 }

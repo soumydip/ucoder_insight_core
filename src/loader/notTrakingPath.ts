@@ -1,4 +1,7 @@
-import { NotTrackPageConfig } from "../interface/event.interface";
+import {
+  NotTrackPageConfig,
+  TrackPerformaceConfig,
+} from "../interface/event.interface";
 
 let userConfig: Partial<NotTrackPageConfig> = {};
 
@@ -55,6 +58,7 @@ export function is404Page(currentPath: string): boolean {
   return false;
 }
 
+// Determines if the current page should be excluded from tracking based on user configuration
 export function isNotTrackPage(currentPath: string): boolean {
   if (!userConfig.notTrackPath) return false;
 
@@ -89,3 +93,35 @@ export function isNotTrackPage(currentPath: string): boolean {
   return false;
 }
 
+let userPerformanceConfig: Partial<TrackPerformaceConfig> = {};
+export const NotTrackPerformancePages = (currentPath: string): boolean => {
+  if (!userPerformanceConfig.path) return false;
+
+  // Check if running in browser (SSR Safety)
+  if (typeof window === "undefined") return false;
+
+  // Normalize to array or single string
+  const notTrackPagesList: string[] = Array.isArray(userPerformanceConfig.path)
+    ? userPerformanceConfig.path
+    : [userPerformanceConfig.path];
+
+  const currentPathLower = currentPath.toLowerCase();
+
+  for (const path of notTrackPagesList) {
+    let configPath = path.toLowerCase();
+
+    // Separate Wildcard vs Exact Match
+    if (configPath.endsWith("*")) {
+      configPath = configPath.slice(0, -1);
+      if (currentPathLower.startsWith(configPath)) {
+        return true;
+      }
+    } else {
+      if (currentPathLower === configPath) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};

@@ -45,6 +45,9 @@ node_modules/
 !.yarn/releases
 !.yarn/versions
 
+
+push.sh
+
 # Vercel
 .vercel
 out/

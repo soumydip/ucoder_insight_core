@@ -6,13 +6,17 @@ import { registerErrorTracking } from "../events/error.events";
 import { enableAutoPageTracking } from "../events/pageView.events";
 import { normalizeUrl } from "../helper/normalizePath";
 import { configureTracker } from "../loader/notTrakingPath";
-import { NotTrackPageConfig } from "../interface/event.interface";
+import {
+  NotTrackPageConfig,
+  TrackPerformaceConfig,
+} from "../interface/event.interface";
 import { registerScrollTracker } from "../events/scroll.event";
 import { registerPerformanceTracking } from "../events/performence.event";
 import { isTestingMode } from "../utils/environment";
 import { isBot } from "../spam/isBot";
 import { registerOutboundLinkEvent } from "../events/OutboundLink.event";
 import { optionalConfigCache } from "../loader/analyticsCache";
+import { initPerformanceTracking } from "./performance.base";
 //
 const isBrowser = typeof window !== "undefined";
 const isVanillaMode = isBrowser && !!(window as any).ucoderInsight;
@@ -27,6 +31,7 @@ let cleanupFns: Array<() => void> = [];
 export async function initUcoderInsight(
   projectId: string,
   userConfig?: NotTrackPageConfig,
+  performanceConfig?: TrackPerformaceConfig,
 ) {
   if (!isBrowser) {
     console.warn(
@@ -103,7 +108,10 @@ export async function initUcoderInsight(
     if (config.trackPageViews) cleanupFns.push(enableAutoPageTracking() as any);
     if (config.trackScroll) cleanupFns.push(registerScrollTracker() as any);
     if (config.trackErrors) cleanupFns.push(registerErrorTracking() as any);
-    if (config.trackPerformance) registerPerformanceTracking();
+    if (config.trackPerformance) {
+      registerPerformanceTracking();
+      await initPerformanceTracking(performanceConfig || {});
+    }
 
     // start the log reporter
     startLogReporter(config.sendInterval);

@@ -26,4 +26,5 @@ export const SDKConfigCache = {
 
 export const optionalConfigCache = {
   debug: false as boolean,
+  trackPerformanceModule: false as boolean,
 }
