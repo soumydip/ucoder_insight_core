@@ -6,17 +6,13 @@ import { registerErrorTracking } from "../events/error.events";
 import { enableAutoPageTracking } from "../events/pageView.events";
 import { normalizeUrl } from "../helper/normalizePath";
 import { configureTracker } from "../loader/notTrakingPath";
-import {
-  NotTrackPageConfig,
-  TrackPerformaceConfig,
-} from "../interface/event.interface";
+import { UcoderInsightConfig } from "../interface/event.interface";
 import { registerScrollTracker } from "../events/scroll.event";
 import { registerPerformanceTracking } from "../events/performence.event";
 import { isTestingMode } from "../utils/environment";
 import { isBot } from "../spam/isBot";
 import { registerOutboundLinkEvent } from "../events/OutboundLink.event";
 import { optionalConfigCache } from "../loader/analyticsCache";
-import { initPerformanceTracking } from "./performance.base";
 //
 const isBrowser = typeof window !== "undefined";
 const isVanillaMode = isBrowser && !!(window as any).ucoderInsight;
@@ -28,10 +24,24 @@ let isInitializing = false;
 // cleanup functions for event listeners and trackers
 let cleanupFns: Array<() => void> = [];
 
+/**
+ * Initializes the UCoder Insight tracking system.
+ * @param projectId - Your unique project ID from the UCoder dashboard.
+ * @param userConfig - Optional configuration to customize tracking behavior.
+ * 
+ * @example
+ * ```typescript
+ * initUcoderInsight('your-project-id', {
+ *   notFoundPath: '/404',
+ *   notTrackPath: ['/privacy', '/terms'],
+ *   debug: true // Enable testing mode to log events in console instead of sending to API
+ *   apiUrl: 'https://custom-api.yourdomain.com/track' // Optional custom API endpoint for testing or custom backend
+ * });
+ * ```
+ */
 export async function initUcoderInsight(
   projectId: string,
-  userConfig?: NotTrackPageConfig,
-  performanceConfig?: TrackPerformaceConfig,
+  userConfig?: UcoderInsightConfig,
 ) {
   if (!isBrowser) {
     console.warn(
@@ -60,13 +70,18 @@ export async function initUcoderInsight(
   if (userConfig?.debug) {
     optionalConfigCache.debug = true;
   }
+  // if user provided custom API URL in config, we should use it instead of default one and log it in debug mode
+  if (userConfig?.apiUrl) {
+    console.log(` [Ucoder Insight] Using custom API URL: ${userConfig.apiUrl}`);
+    optionalConfigCache.apiUrl = userConfig.apiUrl;
+  }
 
   isInitializing = true; // initialization process started, set the flag to prevent
 
   if (isTestingMode()) {
     console.log("[Ucoder Insight] Initializing...");
-    console.log("   Mode:", isVanillaMode ? "Vanilla JS" : "Framework");
-    console.log("   Project ID:", projectId);
+    console.log("Mode:", isVanillaMode ? "Vanilla JS" : "Framework");
+    console.log("Project ID:", projectId);
   }
 
   // if user provided custom config, apply it before fetching server config (so that notTrackPath and debug mode can work immediately)
@@ -108,10 +123,7 @@ export async function initUcoderInsight(
     if (config.trackPageViews) cleanupFns.push(enableAutoPageTracking() as any);
     if (config.trackScroll) cleanupFns.push(registerScrollTracker() as any);
     if (config.trackErrors) cleanupFns.push(registerErrorTracking() as any);
-    if (config.trackPerformance) {
-      registerPerformanceTracking();
-      await initPerformanceTracking(performanceConfig || {});
-    }
+    if (config.trackPerformance) registerPerformanceTracking();
 
     // start the log reporter
     startLogReporter(config.sendInterval);

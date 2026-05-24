@@ -1,4 +1,8 @@
-import { analyticsCache, SDKConfigCache } from "../loader/analyticsCache";
+import {
+  analyticsCache,
+  optionalConfigCache,
+  SDKConfigCache,
+} from "../loader/analyticsCache";
 import {
   saveOfflineBatch,
   getOfflineBatches,
@@ -7,7 +11,11 @@ import {
 } from "../db/cache.offline";
 import { shouldLogToConsole } from "../utils/environment";
 
-const API_URL = "https://insight-api.ucoder.in/event/log";
+const getApiUrl = () =>
+  optionalConfigCache.apiUrl
+    ? `${optionalConfigCache.apiUrl}/event/log`
+    : "https://insight-api.ucoder.in/event/log";
+
 let isSyncing = false;
 
 export const isLogEnabled = (): boolean => {
@@ -79,7 +87,7 @@ export const sendEvents = async (batch: any[]) => {
         type: "application/json",
       });
 
-      const beaconSent = navigator.sendBeacon(API_URL, blob);
+      const beaconSent = navigator.sendBeacon(getApiUrl(), blob);
 
       if (beaconSent) {
         return;
@@ -88,7 +96,7 @@ export const sendEvents = async (batch: any[]) => {
       }
     }
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(getApiUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -146,7 +154,7 @@ const processOfflineQueue = async (): Promise<boolean> => {
       events: allOfflineEvents,
     };
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(getApiUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

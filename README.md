@@ -3,13 +3,27 @@
   
   <h1>UCoder Insight</h1>
   <p><strong>Powerful analytics and user insights tracking SDK for modern web applications</strong></p>
+
+<strong><a href="https://insights.ucoder.in">Live Dashboard</a></strong> &nbsp;•&nbsp;
+<strong><a href="https://insights.ucoder.in/docs">Documentation</a></strong> &nbsp;•&nbsp;
+<strong><a href="https://www.npmjs.com/package/ucoder-insight">NPM</a></strong>
+
+[![npm version](https://img.shields.io/npm/v/ucoder-insight.svg)](https://www.npmjs.com/package/ucoder-insight)
+[![npm downloads](https://img.shields.io/npm/dm/ucoder-insight.svg)](https://www.npmjs.com/package/ucoder-insight)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+<p>
+    Core developed and maintained by <a href="https://soumyadip.ucoder.in">Soumyadip Maity</a>
+  </p>
   
-  [![npm version](https://img.shields.io/npm/v/ucoder-insight.svg)](https://www.npmjs.com/package/ucoder-insight)
-  [![npm downloads](https://img.shields.io/npm/dm/ucoder-insight.svg)](https://www.npmjs.com/package/ucoder-insight)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 </div>
 
 ---
+
+# UCoder Insight SDK - Core Library
+
+## UCoder Insight is a powerful analytics and user insights tracking SDK designed for modern web applications. It provides real-time analytics, custom event tracking, and advanced user behavior insights while prioritizing user privacy and compliance. With a lightweight footprint and easy integration, UCoder Insight helps you understand your users better and make data-driven decisions to grow your business.
 
 ## Features
 
@@ -54,6 +68,15 @@ pnpm add ucoder-insight
 ```
 
 ---
+
+## Configuration Options
+
+| Option         | Type                 | Default     | Description                    |
+| -------------- | -------------------- | ----------- | ------------------------------ |
+| `notFoundPath` | `string`             | `undefined` | Custom 404 page path           |
+| `notTrackPath` | `string \| string[]` | `undefined` | Paths to exclude from tracking |
+| `debug`        | `boolean`            | `false`     | Log to console instead of API  |
+| `apiUrl`       | `string`             | `undefined` | Custom backend API endpoint    |
 
 ## Quick Start
 
@@ -272,6 +295,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **npm**: [ucoder-insight](https://www.npmjs.com/package/ucoder-insight)
 - **Dashboard**: [insights.ucoder.in](https://insights.ucoder.in)
 - **Documentation**: [insights.ucoder.in/docs](https://insights.ucoder.in/docs)
+- **Support**: [insights.ucoder.in/contact](https://insights.ucoder.in/contact)
 
 ---
 

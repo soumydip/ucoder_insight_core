@@ -83,7 +83,11 @@ export interface NotTrackPageConfig {
   debug?: boolean;
 }
 
-export interface NotTrackPage {}
+export interface UcoderInsightConfig extends NotTrackPageConfig {
+  /** Optional custom API URL for sending tracking data. If not provided, the default API endpoint will be used. This can be useful for testing or if you have a custom backend setup.
+   */
+  apiUrl?: string;
+}
 
 /**
  * Configuration for custom events. Helps track user-defined events within the application.
@@ -144,18 +148,4 @@ export interface customEventConfig {
    * ```
    */
   additionalData?: Record<string, string | number | boolean | null | undefined>;
-}
- 
-/**
- * This interface defines the configuration options for tracking page performance. It allows you to specify which page paths should be excluded from performance tracking, helping to focus on relevant pages and avoid unnecessary data collection.
- * @interface TrackPerformaceConfig
- */
-export interface TrackPerformaceConfig {
-  /**
-   * A string or an array of strings representing page paths to exclude from performance tracking (e.g., ['/privacy', '/terms','/admin/*',]).
-   * @type {(string | string[])}
-   * @memberof TrackPerformaceConfig
-   * @optional
-   */
-  path?: string | string[];
 }

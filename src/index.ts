@@ -57,7 +57,7 @@ if (typeof window !== "undefined") {
     },
 
     healthCheck: () => {
-      console.log("✓ [Ucoder Insight] Status Check");
+      console.log(" [Ucoder Insight] Status Check");
       console.log("  Ready:", isReady);
       console.log("  Queue Size:", eventQueue.length);
       return true;

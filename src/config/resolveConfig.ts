@@ -2,7 +2,11 @@ import { DEFAULT_CONFIG } from "./defaultConfig";
 import { applyTrackingMode } from "./trackingElements";
 import { TrackerConfig } from "../interface/config.interface";
 import { TrackingMode } from "../enums/event.enum";
-import { analyticsCache, SDKConfigCache } from "../loader/analyticsCache";
+import {
+  analyticsCache,
+  optionalConfigCache,
+  SDKConfigCache,
+} from "../loader/analyticsCache";
 
 // Update the SDK config cache based on resolved configuration or remote config
 export const updateSDKCache = (config: TrackerConfig) => {
@@ -111,10 +115,13 @@ const fetchRemoteConfig = async (
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 1000;
 
+  const apiUrl = optionalConfigCache.apiUrl
+    ? `${optionalConfigCache.apiUrl}/project/SDK-config/${projectId}`
+    : `https://insight-api.ucoder.in/project/SDK-config/${projectId}`;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await fetch(
-        `https://insight-api.ucoder.in/project/SDK-config/${projectId}`,
+        apiUrl,
       );
       const result = await response.json();
       // if any error in response not config the project
