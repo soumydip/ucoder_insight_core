@@ -60,6 +60,8 @@ We follow standard TypeScript code style. Please ensure your code adheres to the
 - Run the linter before submitting your code.
 - Keep the SDK lightweight. Avoid adding heavy external dependencies.
 - Focus on performance and efficiency in your code.
+- Write tests for any new features or bug fixes you implement.
+- Ensure your code is compatible with the latest version of TypeScript and React.
 
 ## License
 

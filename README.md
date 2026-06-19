@@ -21,9 +21,7 @@
 
 ---
 
-# UCoder Insight SDK - Core Library
-
-## UCoder Insight is a powerful analytics and user insights tracking SDK designed for modern web applications. It provides real-time analytics, custom event tracking, and advanced user behavior insights while prioritizing user privacy and compliance. With a lightweight footprint and easy integration, UCoder Insight helps you understand your users better and make data-driven decisions to grow your business.
+# UCoder Insight SDK - Core NPM Library
 
 ## Features
 
@@ -106,6 +104,7 @@ function App() {
   useEffect(() => {
     initUcoderInsight("YOUR_TRACKING_ID", {
       notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
+      // added more config
     });
   }, []);
 
@@ -128,6 +127,7 @@ export default function Analytics() {
     initUcoderInsight("YOUR_TRACKING_ID", {
       notTrackPath: ["/privacy", "/terms", "/admin/*"],
       debug: process.env.NODE_ENV !== "production", // Optional: helps in local dev
+      // added more config
     });
   }, []);
 
@@ -180,6 +180,7 @@ createApp(App).mount("#app");
     <script>
       UcoderInsight.init("YOUR_TRACKING_ID", {
         notTrackPath: ["/privacy", "/terms", "/admin/*"], // all pages under /admin will be ignored
+        // added more config
       });
     </script>
   </body>
@@ -229,12 +230,38 @@ If `web-vitals` is not installed, all other tracking features (page views, custo
 
 Visit [insights.ucoder.in](https://insights.ucoder.in) to access:
 
-- **Real-user Analytics** - Track real users
-- **User Segments** - Create custom user segments
-- **Retention** - Analyze user retention rates
-- **Geo Analytics** - Location-based insights
-- **Device Breakdown** - Browser, OS, device stats
-- **Custom Reports** - Build your own reports
+## What you get with Ucoder Insights
+
+### Analytics
+
+- **Page Views & Sessions** — Track visits, unique users, and session duration
+- **Geo Analytics** — See where your users are coming from, country and city level
+- **Device Breakdown** — Browser, OS, screen size, and device type
+- **Referrer Tracking** — Know which sources drive your traffic
+- **OutBound Link Tracking** — See which external links users click on
+- **6-Month Data Retention** — All your analytics data kept for 6 months
+
+### User Behavior
+
+- **Click Tracking** — See exactly what users click on
+- **Rage Clicks** — Detect frustrated users clicking repeatedly
+- **Dead Clicks** — Find buttons and links that don't respond
+- **Custom Events** — Track anything with `trackCustomEvent()`
+
+### Error Monitoring
+
+- **JS Error Tracking** — Catch TypeErrors, ReferenceErrors with file name and line number
+- **Unhandled Promise Rejections** — Never miss a silent async failure
+- **Resource Errors** — Detect broken images, scripts, and stylesheets
+- **Error Management** — Resolve, ignore, or mark errors in progress with full activity history
+- **Regression Detection** — Know when a fixed bug comes back
+
+### Privacy & Performance
+
+- **No Cookies** — Zero cookie consent banners needed
+- **Privacy First** — No PII collected by default
+- **Lightweight SDK** — Under 7.4kb (Minified + Gzipped), no performance impact
+- **Offline Support** — IndexedDB queue, events sent when connection restores
 
 ---
 
@@ -252,8 +279,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## Changelog
 
-See [https://insights.ucoder.in/docs/changelog](https://insights.ucoder.in/docs/changelog) for release history.
-
+For a detailed list of changes, please see the [CHANGELOG](CHANGELOG.md).
 ---
 
 ## Bug Reports

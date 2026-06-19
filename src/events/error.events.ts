@@ -1,5 +1,4 @@
 import { ActionType, ErrorType, EventType } from "../enums/event.enum";
-import { normalizeUrl } from "../helper/normalizePath";
 import { analyticsCache, SDKConfigCache } from "../loader/analyticsCache";
 import { is404Page, isNotTrackPage } from "../loader/notTrakingPath";
 import { safeLog } from "../log/safeLog";
@@ -21,7 +20,6 @@ const logError = (type: ErrorType, extra: any = {}) => {
 // JS RUNTIME ERROR (ReferenceError, TypeError, etc)
 const handleJsError = (event: ErrorEvent) => {
   if (!event.error) return;
-
   logError(ErrorType.JS_ERROR, {
     element: event.message,
     tag: "js",
@@ -33,7 +31,7 @@ const handleJsError = (event: ErrorEvent) => {
       fileName: event.filename,
       lineNumber: event.lineno,
       columnNumber: event.colno,
-      stack: event.error?.stack,
+      stack: event.error?.stack || "no-stack",
     },
   });
 };
@@ -54,14 +52,25 @@ const handleResourceError = (event: Event) => {
     additionalInfo: {
       resourceType: target.tagName.toLowerCase(),
       resourceUrl,
-      outerHTML: target.outerHTML.substring(0, 200), //  Truncate
+      outerHTML: target.outerHTML.substring(0, 200),
     },
   });
 };
 
 // UNHANDLED PROMISE REJECTION
 const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+  const error =
+    event.reason instanceof Error
+      ? event.reason
+      : new Error(String(event.reason));
+
   const reason = String(event.reason);
+  const stack = error?.stack || "no-stack";
+
+  // V8 (Chrome): "at fn (file.js:10:5)"
+  // Firefox:     "fn@file.js:10:5"
+  const lineMatch = stack.match(/[:\s](\d+):\d+[\)?\s]?/);
+  const fileMatch = stack.match(/(?:at\s+.*?\(|@)(.*?):\d+:\d+/);
 
   logError(ErrorType.UNHANDLED_REJECTION, {
     element: reason.substring(0, 100),
@@ -70,21 +79,19 @@ const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
     key: `promise_rejection:${location.pathname}:${reason.substring(0, 50)}`,
     additionalInfo: {
       reason: reason,
-      stack: event.reason?.stack || "no-stack",
+      stack: stack,
+      lineNumber: lineMatch ? lineMatch[1] : "unknown",
+      fileName: fileMatch ? fileMatch[1] : "unknown",
     },
   });
 };
 
-
 // Main function to register all error tracking
 export function registerErrorTracking() {
-  //  Check if error tracking is enabled
   if (!SDKConfigCache.trackErrors) {
-    // console.log(" Error tracking is disabled");
     return;
   }
 
-  // track is a 404 page or not track page
   if (is404Page(location.pathname) || isNotTrackPage(location.pathname)) {
     console.log(
       " Error tracking is disabled for this page:",
@@ -93,16 +100,10 @@ export function registerErrorTracking() {
     return;
   }
 
-  // Register JS errors
   window.addEventListener("error", handleJsError);
-
-  // Register resource errors (capture phase)
   window.addEventListener("error", handleResourceError, true);
-
-  // Register unhandled promise rejections
   window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
-  // Return cleanup function
   return () => {
     window.removeEventListener("error", handleJsError);
     window.removeEventListener("error", handleResourceError, true);

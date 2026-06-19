@@ -6,49 +6,31 @@ export function getElementName(el: HTMLElement): string {
     el.id;
 
   if (manual) return normalize(manual);
-
   const tag = el.tagName.toUpperCase();
 
-  // Links
-  if (tag === "A") {
-    const text = el.innerText || el.getAttribute("href") || "link";
-    return normalize(text);
+  if (tag === "BUTTON" || tag === "INPUT" || tag === "A") {
+    const parent =
+      el.closest("form") || el.closest("section") || el.closest("div[id]");
+    const context = parent ? parent.id || parent.tagName : "";
+
+    let label = "";
+    if (tag === "BUTTON") label = el.innerText || "button";
+    else if (tag === "A")
+      label = el.innerText || el.getAttribute("href") || "link";
+    else if (tag === "INPUT")
+      label =
+        el.getAttribute("name") || el.getAttribute("placeholder") || "input";
+
+    return normalize(`${context}_${label}`);
   }
 
-  // Buttons
-  if (tag === "BUTTON") {
-    return normalize(el.innerText || "button");
-  }
+  if (tag === "IMG") return normalize(el.getAttribute("alt") || "image");
+  if (tag === "VIDEO") return normalize("video");
+  if (tag === "AUDIO") return normalize("audio");
 
-  // Inputs
-  if (tag === "INPUT") {
-    const name =
-      el.getAttribute("name") ||
-      el.getAttribute("placeholder") ||
-      (el as HTMLInputElement).type;
-    return normalize(name);
-  }
-  // Images
-  if (tag === "IMG") {
-    return normalize(el.getAttribute("alt") || "image");
-  }
-
-  // videos
-  if (tag === "VIDEO") {
-    return normalize("video");
-  }
-
-  // Audio
-  if (tag === "AUDIO") {
-    return normalize("audio");
-  }
-
-
-  // Fallback text
   const text = el.innerText?.trim();
-  if (text) return normalize(text);
+  if (text && text.length < 50) return normalize(text);
 
-  // Last fallback: tag name
   return normalize(tag.toLowerCase());
 }
 
@@ -59,7 +41,7 @@ function normalize(text: string): string {
       .replace(/[^a-z0-9\s]/g, "")
       .trim()
       .split(/\s+/)
-      .slice(0, 5)
+      .slice(0, 3)
       .join("_") || "element"
   );
 }

@@ -13,6 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.4] - 2026-06-19
+
+#### Minor Release
+
+- Added `Rage & Dead Click Tracking` — Automatically detect and track rapid, repeated clicks that indicate user frustration.
+- Added `TestCase` for sequre testing of the SDK
+- Improved documentation with more examples and best practices for using the SDK effectively.
+
+## [1.1.3] - 2026-06-01
+
+#### Patch Release
+
+- Added `--global-name UcoderInsight` to build pipeline for correct IIFE/CDN exports.
+- Added `apiUrl` for custom backend URL
+- Improved error handling and logging for better debugging.
+
 ## [1.1.2] - 2026-05-19
 
 #### Patch Release
