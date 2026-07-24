@@ -96,7 +96,14 @@ export async function initUcoderInsight(
 
   try {
     // if config fetching fails, we should not proceed with initialization, but we should also release the lock (isInitializing) so that user can try again later without refreshing the page
-    const config = await resolveConfig(projectId);
+    // FIX: userConfig ekhon resolveConfig-e pass kora hocche, noile
+    // trackPerformance/trackScroll-er local override kokhonoi trigger hoto na
+    // userConfig is UcoderInsightConfig; resolveConfig expects Partial<TrackerConfig> | undefined
+    // cast to satisfy TypeScript typing without changing runtime behavior
+    const config = await resolveConfig(
+      projectId,
+      userConfig as unknown as Partial<any>,
+    );
 
     // if config is null or undefined, it means fetching failed or project ID is invalid, we should log an error and exit initialization gracefully
 
@@ -123,7 +130,6 @@ export async function initUcoderInsight(
     if (config.trackPageViews) cleanupFns.push(enableAutoPageTracking() as any);
     if (config.trackScroll) cleanupFns.push(registerScrollTracker() as any);
     if (config.trackErrors) cleanupFns.push(registerErrorTracking() as any);
-    cleanupFns.push(startLogReporter(config.sendInterval) as any);
     if (config.trackPerformance) registerPerformanceTracking();
 
     // start the log reporter
