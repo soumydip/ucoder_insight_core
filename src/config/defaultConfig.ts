@@ -1,7 +1,6 @@
 import { TrackingMode } from "../enums/event.enum";
 import { TrackerConfig } from "../interface/config.interface";
 
-// Default configuration for the tracker, owerridable by remote or user config
 export const DEFAULT_CONFIG: Required<TrackerConfig> = {
   // Core Behavior
   mode: TrackingMode.FREE,

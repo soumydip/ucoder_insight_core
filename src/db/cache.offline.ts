@@ -3,10 +3,11 @@ import { initDB } from "./userMetaData.indexDb";
 
 const LOG_DB_NAME = "Ucoder_Offline_Logs";
 const STORE_NAME = "queue";
-const MAX_BATCH_LIMIT = SDKConfigCache.batchEventSize || 50;
 
 // Save a batch of events to IndexedDB for offline storage
 export const saveOfflineBatch = async (batch: any[]) => {
+  const MAX_BATCH_LIMIT = SDKConfigCache.batchEventSize || 50;
+
   try {
     const db = await initDB(LOG_DB_NAME, STORE_NAME);
     const tx = db.transaction(STORE_NAME, "readwrite");

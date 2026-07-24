@@ -1,7 +1,4 @@
-import {
-  NotTrackPageConfig,
-  TrackPerformaceConfig,
-} from "../interface/event.interface";
+import { NotTrackPageConfig } from "../interface/event.interface";
 
 let userConfig: Partial<NotTrackPageConfig> = {};
 
@@ -93,7 +90,7 @@ export function isNotTrackPage(currentPath: string): boolean {
   return false;
 }
 
-let userPerformanceConfig: Partial<TrackPerformaceConfig> = {};
+let userPerformanceConfig: Partial<TrackPerformanceConfig> = {};
 export const NotTrackPerformancePages = (currentPath: string): boolean => {
   if (!userPerformanceConfig.path) return false;
 

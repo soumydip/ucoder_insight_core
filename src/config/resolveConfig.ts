@@ -120,9 +120,7 @@ const fetchRemoteConfig = async (
     : `https://insight-api.ucoder.in/project/SDK-config/${projectId}`;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await fetch(
-        apiUrl,
-      );
+      const response = await fetch(apiUrl);
       const result = await response.json();
       // if any error in response not config the project
       if (result.success === false) {
@@ -237,6 +235,20 @@ export async function resolveConfig(
     sendAdditionalInfo: features.sendAdditionalInfo,
     batchEventSize: features.batchEventsSize,
   };
+
+  // --- Local developer override: PRO-tier features only, narrowing-only ---
+  // Remote (dashboard) config is HIGH PRIORITY — it sets the ceiling of what's
+  // allowed for this project's plan. Local userConfig can only turn an
+  // already-allowed feature OFF; it can never force a disallowed feature ON.
+  // (The `TrackingToggles` type only accepts `false`, so this is also
+  // enforced at compile time for anyone using TypeScript.)
+  if (userConfig?.trackPerformance === false) {
+    finalConfig.trackPerformance = false;
+  }
+  if (userConfig?.trackScroll === false) {
+    finalConfig.trackScroll = false;
+  }
+
   // Apply tracking mode settings
   applyTrackingMode(isPro ? TrackingMode.PRO : TrackingMode.FREE);
   analyticsCache.projectId = projectId;

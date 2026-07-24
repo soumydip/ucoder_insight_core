@@ -15,18 +15,17 @@ export function allowLog() {
     lastReset = now;
   }
 
-  // Check Limit
+  let hasWarned = false;
   if (counter >= limit) {
-    if (counter === limit) {
-     if(isTestingMode()) {
-      console.warn(
-        " [Ucoder Insight] Rate limit reached: Too many events being tracked. Further events will be dropped until the window resets.",
-      );
-     }
+    if (!hasWarned) {
+      hasWarned = true;
+      if (isTestingMode())
+        console.warn(
+          `Rate limit exceeded: ${limit} events per ${windowMs / 1000} seconds. Further events will be dropped until the window resets.`,
+        );
     }
     return false;
   }
-
   counter++;
   return true;
 }

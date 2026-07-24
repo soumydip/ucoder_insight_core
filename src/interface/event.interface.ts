@@ -1,5 +1,7 @@
 import { ErrorType } from "../enums/event.enum";
 
+;
+
 /**
  * Includes PageViewEvent, ClickEvent, FormEvent, ErrorEvent, and CustomEvent.
  */

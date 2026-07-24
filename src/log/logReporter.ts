@@ -6,7 +6,7 @@ export function startLogReporter(
   intervalMs = 5000,
   onBatchReady?: (batch: any[]) => void,
 ) {
-  setInterval(() => {
+  const id = setInterval(() => {
     //  Skip batch processing if SDK not configured
     if (!isLoggingAllowed()) {
       console.log(" SDK not ready. Skipping batch processing.");
@@ -34,4 +34,5 @@ export function startLogReporter(
     // Clean up sent logs
     keys.forEach((k) => delete logBuffer[k]);
   }, intervalMs);
+  return () => clearInterval(id);
 }

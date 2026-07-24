@@ -28,7 +28,7 @@ let cleanupFns: Array<() => void> = [];
  * Initializes the UCoder Insight tracking system.
  * @param projectId - Your unique project ID from the UCoder dashboard.
  * @param userConfig - Optional configuration to customize tracking behavior.
- * 
+ *
  * @example
  * ```typescript
  * initUcoderInsight('your-project-id', {
@@ -123,6 +123,7 @@ export async function initUcoderInsight(
     if (config.trackPageViews) cleanupFns.push(enableAutoPageTracking() as any);
     if (config.trackScroll) cleanupFns.push(registerScrollTracker() as any);
     if (config.trackErrors) cleanupFns.push(registerErrorTracking() as any);
+    cleanupFns.push(startLogReporter(config.sendInterval) as any);
     if (config.trackPerformance) registerPerformanceTracking();
 
     // start the log reporter
