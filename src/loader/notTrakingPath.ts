@@ -1,4 +1,4 @@
-import { NotTrackPageConfig } from "../interface/event.interface";
+import { NotTrackPageConfig,TrackPerformanceConfig } from "../interface/event.interface";
 
 let userConfig: Partial<NotTrackPageConfig> = {};
 

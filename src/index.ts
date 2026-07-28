@@ -2,7 +2,13 @@ import { initUcoderInsight } from "./base/core";
 import { trackCustomEvent } from "./events/custom.event";
 import { customEventConfig } from "./interface/event.interface";
 
-export type { NotTrackPageConfig } from "./interface/event.interface";
+// FIX: UcoderInsightConfig ar TrackingToggles age export hocchilo na,
+// tai developer-ra nijer config variable-e ei type use korte parto na
+export type {
+  NotTrackPageConfig,
+  UcoderInsightConfig,
+  TrackingToggles,
+} from "./interface/event.interface";
 export { initUcoderInsight, trackCustomEvent };
 
 // Global flags

@@ -36,6 +36,7 @@
 - **Geo-location** - Automatic location detection and tracking
 - **Bot Detection** - Filters out bot traffic automatically
 - **Web Vitals** - Automatic performance tracking (LCP, CLS, INP, FCP, TTFB) when `web-vitals` is available
+- **Configurable Tracking** - Fine-tune which PRO features (performance, scroll depth) run per project, right from your code
 
 ---
 
@@ -69,12 +70,16 @@ pnpm add ucoder-insight
 
 ## Configuration Options
 
-| Option         | Type                 | Default     | Description                    |
-| -------------- | -------------------- | ----------- | ------------------------------ |
-| `notFoundPath` | `string`             | `undefined` | Custom 404 page path           |
-| `notTrackPath` | `string \| string[]` | `undefined` | Paths to exclude from tracking |
-| `debug`        | `boolean`            | `false`     | Log to console instead of API  |
-| `apiUrl`       | `string`             | `undefined` | Custom backend API endpoint    |
+| Option             | Type                 | Default     | Description                                                                                                                                                                                          |
+| ------------------ | -------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `notFoundPath`     | `string`             | `undefined` | Custom 404 page path                                                                                                                                                                                 |
+| `notTrackPath`     | `string \| string[]` | `undefined` | Paths to exclude from tracking                                                                                                                                                                       |
+| `debug`            | `boolean`            | `false`     | Log to console instead of API                                                                                                                                                                        |
+| `apiUrl`           | `string`             | `undefined` | Custom backend API endpoint                                                                                                                                                                          |
+| `trackPerformance` | `false`              | `undefined` | Opt out of Web Vitals performance tracking. Only takes effect on PRO-plan projects where the dashboard has this feature enabled — it cannot be used to force the feature on for a FREE-plan project. |
+| `trackScroll`      | `false`              | `undefined` | Opt out of scroll-depth tracking. Same PRO-only, opt-out-only behavior as `trackPerformance`.                                                                                                        |
+
+> **Note:** `trackPerformance` and `trackScroll` only accept `false`. Your dashboard plan (FREE/PRO) always decides what's _allowed_; these options let a PRO project locally turn an allowed feature _off_ when it isn't needed. Passing `true` is a TypeScript compile error by design.
 
 ## Quick Start
 
@@ -208,11 +213,26 @@ trackCustomEvent({
 });
 ```
 
+### Opting Out of PRO Features (Performance / Scroll Tracking)
+
+If your project is on the PRO plan (where the dashboard has performance and/or scroll tracking enabled) but a specific site doesn't need one of them, turn it off locally:
+
+```typescript
+import { initUcoderInsight } from "ucoder-insight";
+
+initUcoderInsight("YOUR_TRACKING_ID", {
+  trackPerformance: false, // e.g. you already run your own Web Vitals monitoring
+  trackScroll: false, // e.g. a single-page site where scroll depth isn't meaningful
+});
+```
+
+This is opt-out only — your dashboard plan always decides what's available for the project; these flags cannot enable a feature your plan doesn't already allow.
+
 ---
 
 ## Web Vitals (Performance Tracking)
 
-UCoder Insight automatically collects Web Vitals metrics (LCP, CLS, INP, FCP, TTFB) if `web-vitals` is available in your project.
+UCoder Insight automatically collects Web Vitals metrics (LCP, CLS, INP, FCP, TTFB) if `web-vitals` is available in your project **and** performance tracking is enabled for your project (PRO plan, and not locally disabled via `trackPerformance: false`).
 
 **React / Next.js users** — `web-vitals` comes pre-installed, so performance tracking works out of the box with zero extra setup.
 
@@ -279,8 +299,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## Changelog
 
-For a detailed list of changes, please see the [CHANGELOG](CHANGELOG.md).
----
+## For a detailed list of changes, please see the [CHANGELOG](CHANGELOG.md).
 
 ## Bug Reports
 

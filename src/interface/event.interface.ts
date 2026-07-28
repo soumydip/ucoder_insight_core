@@ -1,40 +1,4 @@
 import { ErrorType } from "../enums/event.enum";
-import { TrackingMode } from "../enums/event.enum";
-import { TrackerConfig } from "../interface/config.interface";
-
-// Default configuration for the tracker, owerridable by remote or user config
-export const DEFAULT_CONFIG: Required<TrackerConfig> = {
-  // Core Behavior
-  mode: TrackingMode.FREE,
-  autoTrack: true,
-  projectId: "",
-  allowDomains: [],
-
-  // Event Tracking Toggles
-  trackPageViews: true,
-  trackClicks: true,
-  trackErrors: true,
-  trackCustomEvents: true,
-
-  // Optional Features
-  trackScroll: false,
-  trackPerformance: false,
-  customEvents: true,
-  sendUserId: true,
-  sendAdditionalInfo: true,
-  batchEventSize: 20,
-
-  // Data Handling
-  cacheOffline: false,
-  sendInterval: 10000, // 10 sec batching
-
-  // Backend / Endpoints
-  userId: true,
-  device: true,
-  geo: true,
-  network: false,
-  additionalInfo: true,
-};
 
 /**
  * Includes PageViewEvent, ClickEvent, FormEvent, ErrorEvent, and CustomEvent.
@@ -119,7 +83,46 @@ export interface NotTrackPageConfig {
   debug?: boolean;
 }
 
-export interface UcoderInsightConfig extends NotTrackPageConfig {
+/**
+ * PRO-tier feature toggles. These features are enabled/disabled with HIGH
+ * PRIORITY from the remote dashboard config (server ceiling) — a FREE-tier
+ * project can never turn these on from code.
+ *
+ * A PRO-tier project (where the dashboard has already enabled the feature)
+ * can use these to locally opt OUT of a feature it doesn't need. The type is
+ * intentionally `false` (not `boolean`) — trying to pass `true` is a
+ * compile-time error, since "forcing on" is never a valid local override.
+ *
+ * @example
+ * ```typescript
+ * initUcoderInsight('project-id', {
+ *   trackPerformance: false, // PRO plan-e enabled thakleo, ei project-e off thakbe
+ * });
+ * ```
+ */
+export interface TrackingToggles {
+  /** Web Vitals (LCP, CLS, INP, FCP, TTFB) performance tracking. PRO-tier, dashboard-controlled ceiling. */
+  trackPerformance?: false;
+  /** Scroll-depth tracking. PRO-tier, dashboard-controlled ceiling. */
+  trackScroll?: false;
+}
+
+/**
+ * Configuration for excluding specific pages from performance tracking.
+ * Used internally to filter out pages where Web Vitals should not be reported
+ * (e.g. admin pages, or pages with known layout-shift-heavy embeds).
+ */
+export interface TrackPerformanceConfig {
+  /**
+   * Page path(s) to exclude from performance tracking. Supports wildcard
+   * matching (e.g. '/admin/*').
+   */
+  path?: string | string[];
+}
+
+export interface UcoderInsightConfig
+  extends NotTrackPageConfig,
+    TrackingToggles {
   /** Optional custom API URL for sending tracking data. If not provided, the default API endpoint will be used. This can be useful for testing or if you have a custom backend setup.
    */
   apiUrl?: string;

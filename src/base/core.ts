@@ -96,14 +96,10 @@ export async function initUcoderInsight(
 
   try {
     // if config fetching fails, we should not proceed with initialization, but we should also release the lock (isInitializing) so that user can try again later without refreshing the page
-    // FIX: userConfig ekhon resolveConfig-e pass kora hocche, noile
-    // trackPerformance/trackScroll-er local override kokhonoi trigger hoto na
-    // userConfig is UcoderInsightConfig; resolveConfig expects Partial<TrackerConfig> | undefined
-    // cast to satisfy TypeScript typing without changing runtime behavior
-    const config = await resolveConfig(
-      projectId,
-      userConfig as unknown as Partial<any>,
-    );
+    // FIX: userConfig ekhon resolveConfig-e pass kora hocche (proper type,
+    // 'as any' cast lagche na — UcoderInsightConfig ekhon TrackingToggles
+    // extend kore, tai Partial<TrackerConfig>-er sathe structurally compatible)
+    const config = await resolveConfig(projectId, userConfig);
 
     // if config is null or undefined, it means fetching failed or project ID is invalid, we should log an error and exit initialization gracefully
 
@@ -133,7 +129,9 @@ export async function initUcoderInsight(
     if (config.trackPerformance) registerPerformanceTracking();
 
     // start the log reporter
-    startLogReporter(config.sendInterval);
+    // FIX: startLogReporter()-er cleanup function ekhon cleanupFns-e push
+    // kora hocche, noile stopUcoderInsight() call korle-o interval bondo hoto na
+    cleanupFns.push(startLogReporter(config.sendInterval) as any);
 
     if (isTestingMode()) {
       console.log(
